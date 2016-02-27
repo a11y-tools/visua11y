@@ -1,0 +1,28 @@
+{
+  "manifest_version": 2,
+  "name": "Visua11y",
+  "version": "1.0",
+
+  "description": "Adds a browser action icon to the toolbar. Click the button to toggle the Visua11y menu. When a menu selection is made, the active tab's body content is modified by the chosen Visua11y app.",
+  "homepage_url": "https://nhoyt.com",
+  "icons": {
+    "48": "icons/beasts-48.png"
+  },
+
+  "applications": {
+    "gecko": {
+      "id": "visua11y@ainspector.org",
+      "strict_min_version": "45.0"
+    }
+  },
+
+  "permissions": [
+    "activeTab"
+  ],
+
+  "browser_action": {
+    "default_icon": "icons/beasts-32.png",
+    "default_title": "Visua11y",
+    "default_popup": "popup/popup.html"
+  }
+}

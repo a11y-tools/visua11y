@@ -1,0 +1,15 @@
+html, body {
+  width: 120px;
+}
+
+.visua11y {
+  margin: 3% auto;
+  padding: 4px;
+  font-size: 1.5em;
+  background-color: #E5F2F2;
+  cursor: pointer;
+}
+
+.visua11y:hover {
+  background-color: #CFF2F2;
+}
