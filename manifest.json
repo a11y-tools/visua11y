@@ -1,19 +1,12 @@
 {
   "manifest_version": 2,
   "name": "Visua11y",
-  "version": "1.0",
+  "version": "0.1.0",
 
-  "description": "Adds a browser action icon to the toolbar. Click the button to toggle the Visua11y menu. When a menu selection is made, the active tab's body content is modified by the chosen Visua11y app.",
-  "homepage_url": "https://nhoyt.com",
+  "description": "Each item in the Visua11y menu toggles an accessibility (a11y) visualization app that highlights a targeted set of a11y-related elements on the page and provides a tooltip for each element containing pertinent a11y information.",
+  "homepage_url": "https://github.com/oaa-tools/visua11y",
   "icons": {
     "48": "icons/beasts-48.png"
-  },
-
-  "applications": {
-    "gecko": {
-      "id": "visua11y@ainspector.org",
-      "strict_min_version": "45.0"
-    }
   },
 
   "permissions": [

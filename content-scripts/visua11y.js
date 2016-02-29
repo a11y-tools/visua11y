@@ -35,6 +35,14 @@ function runSelectedApp (selection) {
       if (typeof window.a11yHeadings !== 'function') window.a11yHeadings = initHeadings();
       window.a11yHeadings.run();
       break;
+    case 'Images':
+      if (typeof window.a11yImages !== 'function') window.a11yImages = initImages();
+      window.a11yImages.run();
+      break;
+    case 'Lists':
+      if (typeof window.a11yLists !== 'function') window.a11yLists = initLists();
+      window.a11yLists.run();
+      break;
     case 'Forms':
       if (typeof window.a11yForms !== 'function') window.a11yForms = initForms();
       window.a11yForms.run();
@@ -119,6 +127,38 @@ function initHeadings () {
 }
 
 /*
+*   images.js: highlight image elements
+*/
+
+function initImages () {
+  const appName  = getAppName('Images')
+  const cssClass = getUniqueCssClass('Images');
+
+  let targetList = [
+    {selector: "area", color: "teal",   label: "area"},
+    {selector: "img",  color: "olive",  label: "img"},
+    {selector: "svg",  color: "purple", label: "svg"}
+  ];
+
+  let selectors = targetList.map(function (tgt) {return tgt.selector;}).join(', ');
+
+  function getInfo (element, target) {
+    return new InfoObject(element, 'IMAGE INFO');
+  }
+
+  let params = {
+    msgTitle:   "Images",
+    msgText:    "No image elements (" + selectors + ") found.",
+    targetList: targetList,
+    cssClass:   cssClass,
+    getInfo:    getInfo,
+    dndFlag:    true
+  };
+
+  return new Bookmarklet(appName, params);
+}
+
+/*
 *   landmarks.js: highlight ARIA landmarks
 */
 
@@ -165,6 +205,52 @@ function initLandmarks () {
   let params = {
     msgTitle:   "Landmarks",
     msgText:    "No elements with ARIA Landmark roles found: <ul>" + selectors + "</ul>",
+    targetList: targetList,
+    cssClass:   cssClass,
+    getInfo:    getInfo,
+    dndFlag:    true
+  };
+
+  return new Bookmarklet(appName, params);
+}
+
+/*
+*   lists.js: highlight list elements
+*/
+
+function initLists () {
+  const appName  = getAppName('Lists');
+  const cssClass = getUniqueCssClass('Lists');
+
+  let targetList = [
+    {selector: "dl", color: "olive",  label: "dl"},
+    {selector: "ol", color: "purple", label: "ol"},
+    {selector: "ul", color: "navy",   label: "ul"}
+  ];
+
+  let selectors = targetList.map(function (tgt) {return tgt.selector;}).join(', ');
+
+  function getInfo (element, target) {
+    let listCount;
+
+    switch (target.label) {
+      case 'dl':
+        listCount = countChildrenWithTagNames(element, ['DT', 'DD']);
+        break;
+      case 'ol':
+      case 'ul':
+        listCount = countChildrenWithTagNames(element, ['LI']);
+        break;
+    }
+
+    let info = new InfoObject(element, 'LIST INFO');
+    info.addProps(listCount + ' items');
+    return info;
+  }
+
+  let params = {
+    msgTitle:   "Lists",
+    msgText:    "No list elements (" + selectors + ") found.",
     targetList: targetList,
     cssClass:   cssClass,
     getInfo:    getInfo,
