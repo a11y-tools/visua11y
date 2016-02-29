@@ -3,12 +3,29 @@
 var zIndex = 100000;
 var MSG_DIALOG = 'a11yMessageDialog';
 
+function getAppName (name) {
+  return 'a11y' + name;
+}
+
+function getUniqueCssClass (name) {
+  let prefix = 'a11yGfdXALm';
+
+  switch (name) {
+    case 'Forms':     return prefix + '0';
+    case 'Headings':  return prefix + '1';
+    case 'Images':    return prefix + '2';
+    case 'Landmarks': return prefix + '3';
+    case 'Lists':     return prefix + '4';
+  }
+  return 'unrecognizedName';
+}
+
 function visua11y (request, sender, sendResponse) {
-  performAction(request.selection);
+  runSelectedApp(request.selection);
   chrome.runtime.onMessage.removeListener(visua11y);
 }
 
-function performAction (selection) {
+function runSelectedApp (selection) {
   switch(selection) {
     case 'Landmarks':
       if (typeof window.a11yLandmarks !== 'function') window.a11yLandmarks = initLandmarks();
@@ -28,11 +45,13 @@ function performAction (selection) {
 chrome.runtime.onMessage.addListener(visua11y);
 
 /*
-*   forms.js: bookmarklet script for highlighting form-related elements
+*   forms.js: highlight form-related elements
 */
 
 function initForms () {
-  const formsCss     = "a11yGfdXALm0";
+  const appName  = getAppName('Forms');
+  const cssClass = getUniqueCssClass('Forms');
+
   let targetList = [
     {selector: "button",   color: "purple", label: "button"},
     {selector: "input",    color: "navy",   label: "input"},
@@ -54,20 +73,22 @@ function initForms () {
     msgTitle:   "Forms",
     msgText:    "No form-related elements found: <ul>" + selectors + "</ul>",
     targetList: targetList,
-    cssClass:   formsCss,
+    cssClass:   cssClass,
     getInfo:    getInfo,
     dndFlag:    true
   };
 
-  return new Bookmarklet("a11yForms", params);
+  return new Bookmarklet(appName, params);
 }
 
 /*
-*   headings.js: bookmarklet script for highlighting heading elements
+*   headings.js: highlight heading elements
 */
 
 function initHeadings () {
-  const headingsCss = "a11yGfdXALm1";
+  const appName  = getAppName('Headings')
+  const cssClass = getUniqueCssClass('Headings');
+
   let targetList = [
     {selector: "h1", color: "navy",   label: "h1"},
     {selector: "h2", color: "olive",  label: "h2"},
@@ -89,20 +110,22 @@ function initHeadings () {
     msgTitle:   "Headings",
     msgText:    "No heading elements (" + selectors + ") found.",
     targetList: targetList,
-    cssClass:   headingsCss,
+    cssClass:   cssClass,
     getInfo:    getInfo,
     dndFlag:    true
   };
 
-  return new Bookmarklet("a11yHeadings", params);
+  return new Bookmarklet(appName, params);
 }
 
 /*
-*   landmarks.js: bookmarklet script for highlighting ARIA landmarks
+*   landmarks.js: highlight ARIA landmarks
 */
 
 function initLandmarks () {
-  const landmarksCss = "a11yGfdXALm3";
+  const appName  = getAppName('Landmarks');
+  const cssClass = getUniqueCssClass('Landmarks');
+
   // Filter function called on a list of elements returned by selector
   // 'footer, [role="contentinfo"]'. It returns true for the following
   // conditions: (1) element IS NOT a footer element; (2) element IS a
@@ -143,12 +166,12 @@ function initLandmarks () {
     msgTitle:   "Landmarks",
     msgText:    "No elements with ARIA Landmark roles found: <ul>" + selectors + "</ul>",
     targetList: targetList,
-    cssClass:   landmarksCss,
+    cssClass:   cssClass,
     getInfo:    getInfo,
     dndFlag:    true
   };
 
-  return new Bookmarklet("a11yLandmarks", params);
+  return new Bookmarklet(appName, params);
 }
 
 /*
@@ -429,10 +452,6 @@ function removeNodes (cssClass) {
     document.body.removeChild(element);
   });
 }
-
-/*
-*   Unique CSS class names
-*/
 
 /*
 *   embedded.js
