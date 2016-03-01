@@ -1,14 +1,17 @@
-'use strict';
+"use strict";
 
 var zIndex = 100000;
-var MSG_DIALOG = 'a11yMessageDialog';
+
+var CONSTANTS = {};
+Object.defineProperty(CONSTANTS, 'appPrefix',   { value: 'a11y' });
+Object.defineProperty(CONSTANTS, 'classPrefix', { value: 'a11yGfdXALm' });
 
 function getAppName (name) {
-  return 'a11y' + name;
+  return CONSTANTS.appPrefix + name;
 }
 
 function getUniqueCssClass (name) {
-  let prefix = 'a11yGfdXALm';
+  const prefix = CONSTANTS.classPrefix;
 
   switch (name) {
     case 'Forms':     return prefix + '0';
@@ -17,6 +20,7 @@ function getUniqueCssClass (name) {
     case 'Landmarks': return prefix + '3';
     case 'Lists':     return prefix + '4';
   }
+
   return 'unrecognizedName';
 }
 
@@ -303,6 +307,7 @@ InfoObject.prototype.addProps = function (val) {
 */
 
 function Bookmarklet (globalName, params) {
+  // use singleton pattern
   if (typeof window[globalName] === 'object')
     return window[globalName];
 
@@ -312,9 +317,10 @@ function Bookmarklet (globalName, params) {
   this.params   = params;
   this.show     = false;
 
+  let dialog = new MessageDialog();
   window.addEventListener('resize', event => {
     removeNodes(this.cssClass);
-    resize();
+    dialog.resize();
     this.show = false;
   });
 
@@ -322,11 +328,14 @@ function Bookmarklet (globalName, params) {
 }
 
 Bookmarklet.prototype.run = function () {
-  hide();
+  let dialog = new MessageDialog();
+
+  dialog.hide();
   this.show = !this.show;
+
   if (this.show) {
     if (addNodes(this.params) === 0) {
-      show(this.msgTitle, this.msgText);
+      dialog.show(this.msgTitle, this.msgText);
       this.show = false;
     }
   }
@@ -359,11 +368,11 @@ function setBoxGeometry (dialog) {
 *   purpose is to alert the user when no target elements are found by
 *   a bookmarklet.
 */
-function createMsgDialog (handler) {
+function createMsgDialog (cssClass, handler) {
   let dialog = document.createElement("div");
   let button  = document.createElement("button");
 
-  dialog.className = "oaa-message-dialog";
+  dialog.className = cssClass;
   setBoxGeometry(dialog);
 
   button.onclick = handler;
@@ -381,13 +390,22 @@ function deleteMsgDialog (dialog) {
 }
 
 /*
+*   MessageDialog: Wrapper for show, hide and resize methods
+*/
+function MessageDialog () {
+  this.GLOBAL_NAME = 'a11yMessageDialog';
+  this.CSS_CLASS = 'oaa-message-dialog';
+}
+
+/*
 *   show: show message dialog
 */
-function show (title, message) {
+MessageDialog.prototype.show = function (title, message) {
+  const MSG_DIALOG = this.GLOBAL_NAME;
   let h2, div;
 
   if (!window[MSG_DIALOG])
-    window[MSG_DIALOG] = createMsgDialog(hide);
+    window[MSG_DIALOG] = createMsgDialog(this.CSS_CLASS, event => this.hide());
 
   h2 = document.createElement("h2");
   h2.innerHTML = title;
@@ -396,25 +414,27 @@ function show (title, message) {
   div = document.createElement("div");
   div.innerHTML = message;
   window[MSG_DIALOG].appendChild(div);
-}
+};
 
 /*
 *   hide: hide message dialog
 */
-function hide () {
+MessageDialog.prototype.hide = function () {
+  const MSG_DIALOG = this.GLOBAL_NAME;
   if (window[MSG_DIALOG]) {
     deleteMsgDialog(window[MSG_DIALOG]);
     delete(window[MSG_DIALOG]);
   }
-}
+};
 
 /*
 *   resize: resize message dialog
 */
-function resize () {
+MessageDialog.prototype.resize = function () {
+  const MSG_DIALOG = this.GLOBAL_NAME;
   if (window[MSG_DIALOG])
     setBoxGeometry(window[MSG_DIALOG]);
-}
+};
 
 /*
 *   dom.js: functions and constants for adding and removing DOM overlay elements
