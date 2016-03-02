@@ -30,28 +30,31 @@ function visua11y (request, sender, sendResponse) {
 }
 
 function runSelectedApp (selection) {
+  let appName = getAppName(selection);
+  let initApp = null;
+
   switch(selection) {
-    case 'Landmarks':
-      if (typeof window.a11yLandmarks !== 'function') window.a11yLandmarks = initLandmarks();
-      window.a11yLandmarks.run();
+    case 'Forms':
+      initApp = initForms;
       break;
     case 'Headings':
-      if (typeof window.a11yHeadings !== 'function') window.a11yHeadings = initHeadings();
-      window.a11yHeadings.run();
+      initApp = initHeadings;
       break;
     case 'Images':
-      if (typeof window.a11yImages !== 'function') window.a11yImages = initImages();
-      window.a11yImages.run();
+      initApp = initImages;
+      break;
+    case 'Landmarks':
+      initApp = initLandmarks;
       break;
     case 'Lists':
-      if (typeof window.a11yLists !== 'function') window.a11yLists = initLists();
-      window.a11yLists.run();
-      break;
-    case 'Forms':
-      if (typeof window.a11yForms !== 'function') window.a11yForms = initForms();
-      window.a11yForms.run();
+      initApp = initLists;
       break;
   }
+  if (initApp === null) return;
+
+  if (typeof window[appName] !== 'function')
+    window[appName] = initApp();
+  window[appName].run();
 }
 
 chrome.runtime.onMessage.addListener(visua11y);
