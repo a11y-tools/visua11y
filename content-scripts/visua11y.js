@@ -1,29 +1,5 @@
 "use strict";
 
-var zIndex = 100000;
-
-var CONSTANTS = {};
-Object.defineProperty(CONSTANTS, 'appPrefix',   { value: 'a11y' });
-Object.defineProperty(CONSTANTS, 'classPrefix', { value: 'a11yGfdXALm' });
-
-function getAppName (name) {
-  return CONSTANTS.appPrefix + name;
-}
-
-function getUniqueCssClass (name) {
-  const prefix = CONSTANTS.classPrefix;
-
-  switch (name) {
-    case 'Forms':     return prefix + '0';
-    case 'Headings':  return prefix + '1';
-    case 'Images':    return prefix + '2';
-    case 'Landmarks': return prefix + '3';
-    case 'Lists':     return prefix + '4';
-  }
-
-  return 'unrecognizedName';
-}
-
 function visua11y (request, sender, sendResponse) {
   runSelectedApp(request.selection);
   chrome.runtime.onMessage.removeListener(visua11y);
@@ -101,7 +77,7 @@ function initForms () {
 */
 
 function initHeadings () {
-  const appName  = getAppName('Headings')
+  const appName  = getAppName('Headings');
   const cssClass = getUniqueCssClass('Headings');
 
   let targetList = [
@@ -138,7 +114,7 @@ function initHeadings () {
 */
 
 function initImages () {
-  const appName  = getAppName('Images')
+  const appName  = getAppName('Images');
   const cssClass = getUniqueCssClass('Images');
 
   let targetList = [
@@ -268,44 +244,6 @@ function initLists () {
 }
 
 /*
-*   InfoObject.js
-*/
-
-/*
-*  nameIncludesDescription: Determine whether accName object's name
-*  property includes the accDesc object's name property content.
-*/
-function nameIncludesDescription (accName, accDesc) {
-  if (accName === null || accDesc === null) return false;
-
-  let name = accName.name, desc = accDesc.name;
-  if (typeof name === 'string' && typeof desc === 'string') {
-    return name.toLowerCase().includes(desc.toLowerCase());
-  }
-
-  return false;
-}
-
-function InfoObject (element, title) {
-  this.title     = title;
-  this.element   = getElementInfo(element);
-  this.grpLabels = getGroupingLabels(element);
-  this.accName   = getAccessibleName(element);
-  this.accDesc   = getAccessibleDesc(element);
-  this.role      = getAriaRole(element);
-
-  // Ensure that accessible description is not a duplication
-  // of accessible name content. If it is, nullify the desc.
-  if (nameIncludesDescription (this.accName, this.accDesc)) {
-    this.accDesc = null;
-  }
-}
-
-InfoObject.prototype.addProps = function (val) {
-  this.props = val;
-};
-
-/*
 *   Bookmarklet.js
 */
 
@@ -346,6 +284,71 @@ Bookmarklet.prototype.run = function () {
     removeNodes(this.cssClass);
   }
 };
+
+/*
+*   InfoObject.js
+*/
+
+/*
+*  nameIncludesDescription: Determine whether accName object's name
+*  property includes the accDesc object's name property content.
+*/
+function nameIncludesDescription (accName, accDesc) {
+  if (accName === null || accDesc === null) return false;
+
+  let name = accName.name, desc = accDesc.name;
+  if (typeof name === 'string' && typeof desc === 'string') {
+    return name.toLowerCase().includes(desc.toLowerCase());
+  }
+
+  return false;
+}
+
+function InfoObject (element, title) {
+  this.title     = title;
+  this.element   = getElementInfo(element);
+  this.grpLabels = getGroupingLabels(element);
+  this.accName   = getAccessibleName(element);
+  this.accDesc   = getAccessibleDesc(element);
+  this.role      = getAriaRole(element);
+
+  // Ensure that accessible description is not a duplication
+  // of accessible name content. If it is, nullify the desc.
+  if (nameIncludesDescription (this.accName, this.accDesc)) {
+    this.accDesc = null;
+  }
+}
+
+InfoObject.prototype.addProps = function (val) {
+  this.props = val;
+}
+
+/*
+*   constants.js
+*/
+
+var CONSTANTS = {};
+Object.defineProperty(CONSTANTS, 'appPrefix',   { value: 'a11y' });
+Object.defineProperty(CONSTANTS, 'classPrefix', { value: 'a11yGfdXALm' });
+
+function getAppName (name) {
+  return CONSTANTS.appPrefix + name;
+}
+
+function getUniqueCssClass (name) {
+  const prefix = CONSTANTS.classPrefix;
+
+  switch (name) {
+    case 'Forms':       return prefix + '0';
+    case 'Headings':    return prefix + '1';
+    case 'Images':      return prefix + '2';
+    case 'Landmarks':   return prefix + '3';
+    case 'Lists':       return prefix + '4';
+    case 'Interactive': return prefix + '5';
+  }
+
+  return 'unrecognizedName';
+}
 
 /*
 *   dialog.js: functions for creating, modifying and deleting message dialog
@@ -1363,15 +1366,16 @@ function nameFromDetailsOrSummary (element) {
 *   overlay.js: functions for creating and modifying DOM overlay elements
 */
 
+var zIndex = 100000;
 
 /*
 *   createOverlay: Create overlay div with size and position based on the
 *   boundingRect properties of its corresponding target element.
 */
 function createOverlay (tgt, rect, cname) {
+  let scrollOffsets = getScrollOffsets();
   const MINWIDTH  = 68;
   const MINHEIGHT = 27;
-  let scrollOffsets = getScrollOffsets();
 
   let node = document.createElement("div");
   node.setAttribute("class", [cname, 'oaa-element-overlay'].join(' '));
