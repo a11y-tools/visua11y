@@ -14,7 +14,7 @@
   ],
 
   "browser_action": {
-    "default_icon": "icons/beasts-32.png",
+    "default_icon": "icons/visua11y-38.png",
     "default_title": "Visua11y",
     "default_popup": "popup/popup.html"
   }
