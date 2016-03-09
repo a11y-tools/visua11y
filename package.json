@@ -1,0 +1,24 @@
+{
+  "name": "visua11y",
+  "version": "0.1.0",
+  "description": "Chrome extension that runs accessibility visualization apps based on bookmarklets",
+  "main": "gulpfile.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oaa-tools/visua11y.git"
+  },
+  "author": "Nicholas Hoyt",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/oaa-tools/visua11y/issues"
+  },
+  "homepage": "https://github.com/oaa-tools/visua11y#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.0"
+  },
+  "scripts": {
+    "build": "gulp && cp ./src/styles.css ./content-scripts/visua11y.css",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
