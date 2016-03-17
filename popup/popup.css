@@ -1,11 +1,19 @@
 html, body {
-  width: 120px;
+  margin: 0;
+  padding: 0;
+  width: 100px;
+}
+
+ul {
+  margin: 4px;
+  padding: 0;
+  list-style: none;
 }
 
 .visua11y {
   margin: 3% auto;
   padding: 4px;
-  font-size: 1.5em;
+  font-size: 1rem;
   background-color: #E5F2F2;
   cursor: pointer;
 }
