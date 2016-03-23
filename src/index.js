@@ -6,7 +6,7 @@ function visua11y (request, sender, sendResponse) {
 }
 
 function runSelectedApp (selection) {
-  let appName = getAppName(selection);
+  let globalName = getGlobalName(selection);
   let initApp = null;
 
   switch(selection) {
@@ -28,9 +28,9 @@ function runSelectedApp (selection) {
   }
   if (initApp === null) return;
 
-  if (typeof window[appName] !== 'function')
-    window[appName] = initApp();
-  window[appName].run();
+  if (typeof window[globalName] !== 'object')
+    window[globalName] = initApp();
+  window[globalName].run();
 }
 
 chrome.runtime.onMessage.addListener(visua11y);
