@@ -41,6 +41,8 @@ chrome.runtime.onMessage.addListener(visua11y);
 
 function initForms () {
 
+  addPolyfills();
+
   let targetList = [
     {selector: "button",   color: "purple", label: "button"},
     {selector: "input",    color: "navy",   label: "input"},
@@ -75,6 +77,8 @@ function initForms () {
 */
 
 function initHeadings () {
+
+  addPolyfills();
 
   let targetList = [
     {selector: "h1", color: "navy",   label: "h1"},
@@ -111,6 +115,8 @@ function initHeadings () {
 
 function initImages () {
 
+  addPolyfills();
+
   let targetList = [
     {selector: "area", color: "teal",   label: "area"},
     {selector: "img",  color: "olive",  label: "img"},
@@ -140,6 +146,8 @@ function initImages () {
 */
 
 function initLandmarks () {
+
+  addPolyfills();
 
   // Filter function called on a list of elements returned by selector
   // 'footer, [role="contentinfo"]'. It returns true for the following
@@ -198,6 +206,8 @@ function initLandmarks () {
 
 function initLists () {
 
+  addPolyfills();
+
   let targetList = [
     {selector: "dl", color: "olive",  label: "dl"},
     {selector: "ol", color: "purple", label: "ol"},
@@ -242,7 +252,7 @@ function initLists () {
 
 /* eslint no-console: 0 */
 function logVersionInfo (appName) {
-  console.log(getTitle() + ' v' + getVersion() + ' ' + appName);
+  console.log(getTitle() + ' : v' + getVersion() + ' : ' + appName);
 }
 
 function Bookmarklet (params) {
@@ -332,7 +342,7 @@ var CONSTANTS = {};
 Object.defineProperty(CONSTANTS, 'classPrefix',  { value: 'a11yGfdXALm' });
 Object.defineProperty(CONSTANTS, 'globalPrefix', { value: 'a11y' });
 Object.defineProperty(CONSTANTS, 'title',        { value: 'oaa-tools/bookmarklets' });
-Object.defineProperty(CONSTANTS, 'version',      { value: '0.2.1' });
+Object.defineProperty(CONSTANTS, 'version',      { value: '0.2.2' });
 
 function getCssClass (appName) {
   const prefix = CONSTANTS.classPrefix;
@@ -1441,35 +1451,6 @@ function addDragAndDrop (node) {
 */
 
 /*
-*   initFind: Add polyfill for Array find method defined in ES6. From MDN page:
-*   https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
-*/
-function initFind () {
-  if (!Array.prototype.find) {
-    Array.prototype.find = function (predicate) {
-      if (this === null) {
-        throw new TypeError('Array.prototype.find called on null or undefined');
-      }
-      if (typeof predicate !== 'function') {
-        throw new TypeError('predicate must be a function');
-      }
-      var list = Object(this);
-      var length = list.length >>> 0;
-      var thisArg = arguments[1];
-      var value;
-
-      for (var i = 0; i < length; i++) {
-        value = list[i];
-        if (predicate.call(thisArg, value, i, list)) {
-          return value;
-        }
-      }
-      return undefined;
-    };
-  }
-}
-
-/*
 *   inListOfOptions: Determine whether element is a child of
 *   1. a select element
 *   2. an optgroup element that is a child of a select element
@@ -1581,7 +1562,6 @@ var validRoles = [
 */
 function getValidRole (spaceSepList) {
   let arr = spaceSepList.split(' ');
-  initFind();
 
   for (let i = 0; i < arr.length; i++) {
     let value = arr[i].toLowerCase();
@@ -1756,7 +1736,6 @@ function nameFromIncludesContents (element) {
     'treeitem'
   ];
 
-  initFind();
   let contentsRole = contentsRoles.find(role => role === elementRole);
   return (typeof contentsRole !== 'undefined');
 }
@@ -1854,5 +1833,54 @@ function drag (elementToDrag, dragCallback, event) {
 
     if (e.stopPropagation) e.stopPropagation();
     else e.cancelBubble = true;
+  }
+}
+
+/*
+*   addPolyfills: Add polyfill implementations for JavaScript object methods
+*   defined in ES6 and used by bookmarklets:
+*   1. Array.prototype.find
+*   2. String.prototype.includes
+*/
+function addPolyfills () {
+
+  // From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
+  if (!Array.prototype.find) {
+    Array.prototype.find = function (predicate) {
+      if (this === null) {
+        throw new TypeError('Array.prototype.find called on null or undefined');
+      }
+      if (typeof predicate !== 'function') {
+        throw new TypeError('predicate must be a function');
+      }
+      var list = Object(this);
+      var length = list.length >>> 0;
+      var thisArg = arguments[1];
+      var value;
+
+      for (var i = 0; i < length; i++) {
+        value = list[i];
+        if (predicate.call(thisArg, value, i, list)) {
+          return value;
+        }
+      }
+      return undefined;
+    };
+  }
+
+  // From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes
+  if (!String.prototype.includes) {
+    String.prototype.includes = function (search, start) {
+      if (typeof start !== 'number') {
+        start = 0;
+      }
+
+      if (start + search.length > this.length) {
+        return false;
+      }
+      else {
+        return this.indexOf(search, start) !== -1;
+      }
+    };
   }
 }
