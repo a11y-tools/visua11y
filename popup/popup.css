@@ -21,3 +21,7 @@ ul {
 .visua11y:hover {
   background-color: #CFF2F2;
 }
+
+.visua11y:focus {
+  background-color: #CFF2F2;
+}
