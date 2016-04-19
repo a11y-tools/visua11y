@@ -30,7 +30,7 @@ document.addEventListener("click", function (e) {
 });
 
 /*
-*   @constructor Menu: Encapsulates state and behavior of menu popup
+*   @constructor Menu: Encapsulate state and behavior of menu popup
 *
 *   @param node : The element node that serves as the menu container.
 *          Each child element that serves as a menuitem must have its
@@ -76,6 +76,7 @@ var Menu = function (node) {
 Menu.prototype.init = function () {
   var menu = this,
       mi = this.menuNode.firstElementChild;
+
   while (mi) {
     if (mi.getAttribute('role') === 'menuitem') {
       if (!this.firstItem) this.firstItem = mi;
@@ -112,6 +113,7 @@ Menu.prototype.handleKeydown = function (event) {
       break;
 
     case this.keyCode.ESC:
+    case this.keyCode.TAB:
       this.close();
       flag = true;
       break;
