@@ -30,7 +30,7 @@ document.addEventListener("click", function (e) {
 });
 
 /*
-*   @constructor Menu: Encapsulate state and behavior of menu popup
+*   @constructor Menu: Encapsulates state and behavior of menu popup
 *
 *   @param node : The element node that serves as the menu container.
 *          Each child element that serves as a menuitem must have its
@@ -43,7 +43,7 @@ var Menu = function (node) {
 
   // Check whether menu has child menuitems
   if (node.childElementCount === 0)
-    throw new Error("Constructor argument 'node' has no Element children!")
+    throw new Error("Constructor argument 'node' has no Element children.");
 
   this.menuNode  = node;
   this.firstItem = null;
@@ -88,6 +88,9 @@ Menu.prototype.init = function () {
     }
     mi = mi.nextElementSibling;
   }
+
+  if (!this.firstItem)
+    throw new Error("Menu container element has no menuitem children.");
 
   this.firstItem.focus();
 };
