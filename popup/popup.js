@@ -74,19 +74,20 @@ var Menu = function (node) {
 *   Set focus to first menuitem
 */
 Menu.prototype.init = function () {
-  var menu = this,
-      mi = this.menuNode.firstElementChild;
+  var menuitem, that = this;
 
-  while (mi) {
-    if (mi.getAttribute('role') === 'menuitem') {
-      if (!this.firstItem) this.firstItem = mi;
-      this.lastItem = mi;
-      mi.tabIndex = 0;
-      mi.addEventListener('keydown', function (event) {
-        menu.handleKeydown(event);
+  menuitem = this.menuNode.firstElementChild;
+
+  while (menuitem) {
+    if (menuitem.getAttribute('role') === 'menuitem') {
+      if (!this.firstItem) this.firstItem = menuitem;
+      this.lastItem = menuitem;
+      menuitem.tabIndex = 0;
+      menuitem.addEventListener('keydown', function (event) {
+        that.handleKeydown(event);
       });
     }
-    mi = mi.nextElementSibling;
+    menuitem = menuitem.nextElementSibling;
   }
 
   this.firstItem.focus();
@@ -153,33 +154,33 @@ Menu.prototype.handleKeydown = function (event) {
 };
 
 Menu.prototype.previousItem = function (currentItem) {
-  var mi = currentItem.previousElementSibling;
+  var menuitem = currentItem.previousElementSibling;
 
-  while (mi) {
-    if (mi.getAttribute('role')  === 'menuitem') {
-      mi.focus();
+  while (menuitem) {
+    if (menuitem.getAttribute('role')  === 'menuitem') {
+      menuitem.focus();
       break;
     }
-    mi = mi.previousElementSibling;
+    menuitem = menuitem.previousElementSibling;
   }
 
-  if (!mi && this.lastItem) {
+  if (!menuitem && this.lastItem) {
     this.lastItem.focus();
   }
 };
 
 Menu.prototype.nextItem = function (currentItem) {
-  var mi = currentItem.nextElementSibling;
+  var menuitem = currentItem.nextElementSibling;
 
-  while (mi) {
-    if (mi.getAttribute('role')  === 'menuitem') {
-      mi.focus();
+  while (menuitem) {
+    if (menuitem.getAttribute('role')  === 'menuitem') {
+      menuitem.focus();
       break;
     }
-    mi = mi.nextElementSibling;
+    menuitem = menuitem.nextElementSibling;
   }
 
-  if (!mi && this.firstItem) {
+  if (!menuitem && this.firstItem) {
     this.firstItem.focus();
   }
 };
