@@ -42,7 +42,7 @@ chrome.runtime.onMessage.addListener(visua11y);
 var CONSTANTS = {};
 Object.defineProperty(CONSTANTS, 'classPrefix',  { value: 'a11yGfdXALm' });
 Object.defineProperty(CONSTANTS, 'globalPrefix', { value: 'a11y' });
-Object.defineProperty(CONSTANTS, 'title',        { value: 'oaa-tools/bookmarklets' });
+Object.defineProperty(CONSTANTS, 'title',        { value: 'a11y-tools/bookmarklets-lib' });
 Object.defineProperty(CONSTANTS, 'version',      { value: '0.3.0' });
 
 function getCssClass (appName) {
@@ -1246,12 +1246,12 @@ function formatInfo (info) {
 function getScrollOffsets () {
   let t;
 
-  let xOffset = (typeof window.pageXOffset === "undefined") ?
+  let xOffset = (typeof window.pageXOffset === 'undefined') ?
     (((t = document.documentElement) || (t = document.body.parentNode)) &&
       typeof t.ScrollLeft === 'number' ? t : document.body).ScrollLeft :
     window.pageXOffset;
 
-  let yOffset = (typeof window.pageYOffset === "undefined") ?
+  let yOffset = (typeof window.pageYOffset === 'undefined') ?
     (((t = document.documentElement) || (t = document.body.parentNode)) &&
       typeof t.ScrollTop === 'number' ? t : document.body).ScrollTop :
     window.pageYOffset;
@@ -1278,14 +1278,14 @@ function drag (elementToDrag, dragCallback, event) {
   if (dragCallback) dragCallback(elementToDrag);
 
   if (document.addEventListener) {
-    document.addEventListener("mousemove", moveHandler, true);
-    document.addEventListener("mouseup", upHandler, true);
+    document.addEventListener('mousemove', moveHandler, true);
+    document.addEventListener('mouseup', upHandler, true);
   }
   else if (document.attachEvent) {
     elementToDrag.setCapture();
-    elementToDrag.attachEvent("onmousemove", moveHandler);
-    elementToDrag.attachEvent("onmouseup", upHandler);
-    elementToDrag.attachEvent("onlosecapture", upHandler);
+    elementToDrag.attachEvent('onmousemove', moveHandler);
+    elementToDrag.attachEvent('onmouseup', upHandler);
+    elementToDrag.attachEvent('onlosecapture', upHandler);
   }
 
   if (event.stopPropagation) event.stopPropagation();
@@ -1298,10 +1298,10 @@ function drag (elementToDrag, dragCallback, event) {
     if (!e) e = window.event;
 
     let scroll = getScrollOffsets();
-    elementToDrag.style.left = (e.clientX + scroll.x - deltaX) + "px";
-    elementToDrag.style.top = (e.clientY + scroll.y - deltaY) + "px";
+    elementToDrag.style.left = (e.clientX + scroll.x - deltaX) + 'px';
+    elementToDrag.style.top = (e.clientY + scroll.y - deltaY) + 'px';
 
-    elementToDrag.style.cursor = "move";
+    elementToDrag.style.cursor = 'move';
 
     if (e.stopPropagation) e.stopPropagation();
     else e.cancelBubble = true;
@@ -1310,18 +1310,18 @@ function drag (elementToDrag, dragCallback, event) {
   function upHandler (e) {
     if (!e) e = window.event;
 
-    elementToDrag.style.cursor = "grab";
-    elementToDrag.style.cursor = "-moz-grab";
-    elementToDrag.style.cursor = "-webkit-grab";
+    elementToDrag.style.cursor = 'grab';
+    elementToDrag.style.cursor = '-moz-grab';
+    elementToDrag.style.cursor = '-webkit-grab';
 
     if (document.removeEventListener) {
-        document.removeEventListener("mouseup", upHandler, true);
-        document.removeEventListener("mousemove", moveHandler, true);
+        document.removeEventListener('mouseup', upHandler, true);
+        document.removeEventListener('mousemove', moveHandler, true);
     }
     else if (document.detachEvent) {
-        elementToDrag.detachEvent("onlosecapture", upHandler);
-        elementToDrag.detachEvent("onmouseup", upHandler);
-        elementToDrag.detachEvent("onmousemove", moveHandler);
+        elementToDrag.detachEvent('onlosecapture', upHandler);
+        elementToDrag.detachEvent('onmouseup', upHandler);
+        elementToDrag.detachEvent('onmousemove', moveHandler);
         elementToDrag.releaseCapture();
     }
 
@@ -1394,20 +1394,20 @@ function createOverlay (tgt, rect, cname) {
   const MINWIDTH  = 68;
   const MINHEIGHT = 27;
 
-  let node = document.createElement("div");
-  node.setAttribute("class", [cname, 'oaa-element-overlay'].join(' '));
-  node.startLeft = (rect.left + scrollOffsets.x) + "px";
-  node.startTop  = (rect.top  + scrollOffsets.y) + "px";
+  let node = document.createElement('div');
+  node.setAttribute('class', [cname, 'oaa-element-overlay'].join(' '));
+  node.startLeft = (rect.left + scrollOffsets.x) + 'px';
+  node.startTop  = (rect.top  + scrollOffsets.y) + 'px';
 
   node.style.left = node.startLeft;
   node.style.top  = node.startTop;
-  node.style.width  = Math.max(rect.width, MINWIDTH) + "px";
-  node.style.height = Math.max(rect.height, MINHEIGHT) + "px";
+  node.style.width  = Math.max(rect.width, MINWIDTH) + 'px';
+  node.style.height = Math.max(rect.height, MINHEIGHT) + 'px';
   node.style.borderColor = tgt.color;
   node.style.zIndex = zIndex;
 
-  let label = document.createElement("div");
-  label.setAttribute("class", 'oaa-overlay-label');
+  let label = document.createElement('div');
+  label.setAttribute('class', 'oaa-overlay-label');
   label.style.backgroundColor = tgt.color;
   label.innerHTML = tgt.label;
 
@@ -1491,7 +1491,7 @@ function addNodes (params) {
 *   to remove all instances of the overlay nodes.
 */
 function removeNodes (cssClass) {
-  let selector = "div." + cssClass;
+  let selector = 'div.' + cssClass;
   let elements = document.querySelectorAll(selector);
   Array.prototype.forEach.call(elements, function (element) {
     document.body.removeChild(element);
@@ -1512,9 +1512,9 @@ function setBoxGeometry (dialog) {
   let left   = window.innerWidth / 2 - width / 2;
   let scroll = getScrollOffsets();
 
-  dialog.style.width = width + "px";
-  dialog.style.left  = (scroll.x + left) + "px";
-  dialog.style.top   = (scroll.y + 30) + "px";
+  dialog.style.width = width + 'px';
+  dialog.style.left  = (scroll.x + left) + 'px';
+  dialog.style.top   = (scroll.y + 30) + 'px';
 }
 
 /*
@@ -1523,8 +1523,8 @@ function setBoxGeometry (dialog) {
 *   a bookmarklet.
 */
 function createMsgDialog (cssClass, handler) {
-  let dialog = document.createElement("div");
-  let button  = document.createElement("button");
+  let dialog = document.createElement('div');
+  let button  = document.createElement('button');
 
   dialog.className = cssClass;
   setBoxGeometry(dialog);
@@ -1561,11 +1561,11 @@ MessageDialog.prototype.show = function (title, message) {
   if (!window[MSG_DIALOG])
     window[MSG_DIALOG] = createMsgDialog(this.CSS_CLASS, event => this.hide());
 
-  h2 = document.createElement("h2");
+  h2 = document.createElement('h2');
   h2.innerHTML = title;
   window[MSG_DIALOG].appendChild(h2);
 
-  div = document.createElement("div");
+  div = document.createElement('div');
   div.innerHTML = message;
   window[MSG_DIALOG].appendChild(div);
 };
@@ -1691,14 +1691,14 @@ function initForms () {
   addPolyfills();
 
   let targetList = [
-    {selector: "button",   color: "purple", label: "button"},
-    {selector: "input",    color: "navy",   label: "input"},
-    {selector: "keygen",   color: "gray",   label: "keygen"},
-    {selector: "meter",    color: "maroon", label: "meter"},
-    {selector: "output",   color: "teal",   label: "output"},
-    {selector: "progress", color: "olive",  label: "progress"},
-    {selector: "select",   color: "green",  label: "select"},
-    {selector: "textarea", color: "brown",  label: "textarea"}
+    {selector: 'button',   color: 'purple', label: 'button'},
+    {selector: 'input',    color: 'navy',   label: 'input'},
+    {selector: 'keygen',   color: 'gray',   label: 'keygen'},
+    {selector: 'meter',    color: 'maroon', label: 'meter'},
+    {selector: 'output',   color: 'teal',   label: 'output'},
+    {selector: 'progress', color: 'olive',  label: 'progress'},
+    {selector: 'select',   color: 'green',  label: 'select'},
+    {selector: 'textarea', color: 'brown',  label: 'textarea'}
   ];
 
   let selectors = targetList.map(function (tgt) {return '<li>' + tgt.selector + '</li>';}).join('');
@@ -1708,9 +1708,9 @@ function initForms () {
   }
 
   let params = {
-    appName:    "Forms",
-    cssClass:   getCssClass("Forms"),
-    msgText:    "No form-related elements found: <ul>" + selectors + "</ul>",
+    appName:    'Forms',
+    cssClass:   getCssClass('Forms'),
+    msgText:    'No form-related elements found: <ul>' + selectors + '</ul>',
     targetList: targetList,
     getInfo:    getInfo,
     dndFlag:    true
@@ -1728,12 +1728,12 @@ function initHeadings () {
   addPolyfills();
 
   let targetList = [
-    {selector: "h1", color: "navy",   label: "h1"},
-    {selector: "h2", color: "olive",  label: "h2"},
-    {selector: "h3", color: "purple", label: "h3"},
-    {selector: "h4", color: "green",  label: "h4"},
-    {selector: "h5", color: "gray",   label: "h5"},
-    {selector: "h6", color: "brown",  label: "h6"}
+    {selector: 'h1', color: 'navy',   label: 'h1'},
+    {selector: 'h2', color: 'olive',  label: 'h2'},
+    {selector: 'h3', color: 'purple', label: 'h3'},
+    {selector: 'h4', color: 'green',  label: 'h4'},
+    {selector: 'h5', color: 'gray',   label: 'h5'},
+    {selector: 'h6', color: 'brown',  label: 'h6'}
   ];
 
   let selectors = targetList.map(function (tgt) {return tgt.selector;}).join(', ');
@@ -1745,9 +1745,9 @@ function initHeadings () {
   }
 
   let params = {
-    appName:    "Headings",
-    cssClass:   getCssClass("Headings"),
-    msgText:    "No heading elements (" + selectors + ") found.",
+    appName:    'Headings',
+    cssClass:   getCssClass('Headings'),
+    msgText:    'No heading elements (' + selectors + ') found.',
     targetList: targetList,
     getInfo:    getInfo,
     dndFlag:    true
@@ -1765,9 +1765,9 @@ function initImages () {
   addPolyfills();
 
   let targetList = [
-    {selector: "area", color: "teal",   label: "area"},
-    {selector: "img",  color: "olive",  label: "img"},
-    {selector: "svg",  color: "purple", label: "svg"}
+    {selector: 'area', color: 'teal',   label: 'area'},
+    {selector: 'img',  color: 'olive',  label: 'img'},
+    {selector: 'svg',  color: 'purple', label: 'svg'}
   ];
 
   let selectors = targetList.map(function (tgt) {return tgt.selector;}).join(', ');
@@ -1777,9 +1777,9 @@ function initImages () {
   }
 
   let params = {
-    appName:    "Images",
-    cssClass:   getCssClass("Images"),
-    msgText:    "No image elements (" + selectors + ") found.",
+    appName:    'Images',
+    cssClass:   getCssClass('Images'),
+    msgText:    'No image elements (' + selectors + ') found.',
     targetList: targetList,
     getInfo:    getInfo,
     dndFlag:    true
@@ -1808,30 +1808,30 @@ function initInteractive () {
 
   let targetList = [
     // interactive elements defined in HTML5 spec
-    {selector: "a",                    color: "olive",  label: "a"},
-    {selector: "audio[controls]",      color: "olive",  label: "audio"},
-    {selector: "button",               color: "olive",  label: "button"},
-    {selector: "embed",                color: "purple", label: "embed"},
-    {selector: "iframe",               color: "teal",   label: "iframe"},
-    {selector: "img[usemap]",          color: "maroon", label: "img"},
-    {selector: "input",                color: "navy",   label: "input"},
-    {selector: "keygen",               color: "teal",   label: "keygen"},
-    {selector: "label",                color: "purple", label: "label"},
-    {selector: "object[usemap]",       color: "gray",   label: "object"},
-    {selector: "select",               color: "green",  label: "select"},
-    {selector: "textarea",             color: "navy",   label: "textarea"},
-    {selector: "video[controls]",      color: "navy",   label: "video"},
+    {selector: 'a',                    color: 'olive',  label: 'a'},
+    {selector: 'audio[controls]',      color: 'olive',  label: 'audio'},
+    {selector: 'button',               color: 'olive',  label: 'button'},
+    {selector: 'embed',                color: 'purple', label: 'embed'},
+    {selector: 'iframe',               color: 'teal',   label: 'iframe'},
+    {selector: 'img[usemap]',          color: 'maroon', label: 'img'},
+    {selector: 'input',                color: 'navy',   label: 'input'},
+    {selector: 'keygen',               color: 'teal',   label: 'keygen'},
+    {selector: 'label',                color: 'purple', label: 'label'},
+    {selector: 'object[usemap]',       color: 'gray',   label: 'object'},
+    {selector: 'select',               color: 'green',  label: 'select'},
+    {selector: 'textarea',             color: 'navy',   label: 'textarea'},
+    {selector: 'video[controls]',      color: 'navy',   label: 'video'},
 
     // other form elements
-    {selector: "meter",                color: "maroon", label: "meter"},
-    {selector: "output",               color: "brown",  label: "output"},
-    {selector: "progress",             color: "gray",   label: "progress"},
+    {selector: 'meter',                color: 'maroon', label: 'meter'},
+    {selector: 'output',               color: 'brown',  label: 'output'},
+    {selector: 'progress',             color: 'gray',   label: 'progress'},
 
     // other elements potentially interactive
-    {selector: "area",                 color: "brown",  label: "area"},
-    {selector: "details",              color: "purple", label: "details"},
-    {selector: "svg",                  color: "green",  label: "svg"},
-    {selector: "[tabindex]",           color: "teal",   label: "tabindex"}
+    {selector: 'area',                 color: 'brown',  label: 'area'},
+    {selector: 'details',              color: 'purple', label: 'details'},
+    {selector: 'svg',                  color: 'green',  label: 'svg'},
+    {selector: '[tabindex]',           color: 'teal',   label: 'tabindex'}
   ];
 
   let selectors = targetList.map(function (tgt) {return tgt.selector;}).join(', ');
@@ -1845,9 +1845,9 @@ function initInteractive () {
   }
 
   let params = {
-    appName:    "Interactive",
-    cssClass:   getCssClass("Interactive"),
-    msgText:    "No interactive elements (" + selectors + ") found.",
+    appName:    'Interactive',
+    cssClass:   getCssClass('Interactive'),
+    msgText:    'No interactive elements (' + selectors + ') found.',
     targetList: targetList,
     getInfo:    getInfo,
     evalInfo:   evalInfo,
@@ -1886,16 +1886,16 @@ function initLandmarks () {
   }
 
   let targetList = [
-    {selector: 'aside:not([role]), [role~="complementary"], [role~="COMPLEMENTARY"]',         color: "maroon", label: "complementary"},
-    {selector: 'footer, [role~="contentinfo"], [role~="CONTENTINFO"]', filter: isContentinfo, color: "olive",  label: "contentinfo"},
-    {selector: '[role~="application"], [role~="APPLICATION"]',                                color: "black",  label: "application"},
-    {selector: 'nav, [role~="navigation"], [role~="NAVIGATION"]',                             color: "green",  label: "navigation"},
-    {selector: '[role~="region"][aria-labelledby], [role~="REGION"][aria-labelledby]',        color: "teal",   label: "region"},
-    {selector: '[role~="region"][aria-label], [role~="REGION"][aria-label]',                  color: "teal",   label: "region"},
-    {selector: 'section[aria-labelledby], section[aria-label]',                               color: "teal",   label: "region"},
-    {selector: 'header, [role~="banner"], [role~="BANNER"]', filter: isBanner,                color: "gray",   label: "banner"},
-    {selector: '[role~="search"], [role~="SEARCH"]',                                          color: "purple", label: "search"},
-    {selector: 'main, [role~="main"], [role~="MAIN"]',                                        color: "navy",   label: "main"}
+    {selector: 'aside:not([role]), [role~="complementary"], [role~="COMPLEMENTARY"]',         color: 'maroon', label: 'complementary'},
+    {selector: 'footer, [role~="contentinfo"], [role~="CONTENTINFO"]', filter: isContentinfo, color: 'olive',  label: 'contentinfo'},
+    {selector: '[role~="application"], [role~="APPLICATION"]',                                color: 'black',  label: 'application'},
+    {selector: 'nav, [role~="navigation"], [role~="NAVIGATION"]',                             color: 'green',  label: 'navigation'},
+    {selector: '[role~="region"][aria-labelledby], [role~="REGION"][aria-labelledby]',        color: 'teal',   label: 'region'},
+    {selector: '[role~="region"][aria-label], [role~="REGION"][aria-label]',                  color: 'teal',   label: 'region'},
+    {selector: 'section[aria-labelledby], section[aria-label]',                               color: 'teal',   label: 'region'},
+    {selector: 'header, [role~="banner"], [role~="BANNER"]', filter: isBanner,                color: 'gray',   label: 'banner'},
+    {selector: '[role~="search"], [role~="SEARCH"]',                                          color: 'purple', label: 'search'},
+    {selector: 'main, [role~="main"], [role~="MAIN"]',                                        color: 'navy',   label: 'main'}
   ];
 
   let selectors = targetList.map(function (tgt) {return '<li>' + tgt.selector + '</li>';}).join('');
@@ -1905,9 +1905,9 @@ function initLandmarks () {
   }
 
   let params = {
-    appName:    "Landmarks",
-    cssClass:   getCssClass("Landmarks"),
-    msgText:    "No elements with ARIA Landmark roles found: <ul>" + selectors + "</ul>",
+    appName:    'Landmarks',
+    cssClass:   getCssClass('Landmarks'),
+    msgText:    'No elements with ARIA Landmark roles found: <ul>' + selectors + '</ul>',
     targetList: targetList,
     getInfo:    getInfo,
     dndFlag:    true
@@ -1925,9 +1925,9 @@ function initLists () {
   addPolyfills();
 
   let targetList = [
-    {selector: "dl", color: "olive",  label: "dl"},
-    {selector: "ol", color: "purple", label: "ol"},
-    {selector: "ul", color: "navy",   label: "ul"}
+    {selector: 'dl', color: 'olive',  label: 'dl'},
+    {selector: 'ol', color: 'purple', label: 'ol'},
+    {selector: 'ul', color: 'navy',   label: 'ul'}
   ];
 
   let selectors = targetList.map(function (tgt) {return tgt.selector;}).join(', ');
@@ -1951,9 +1951,9 @@ function initLists () {
   }
 
   let params = {
-    appName:    "Lists",
-    cssClass:   getCssClass("Lists"),
-    msgText:    "No list elements (" + selectors + ") found.",
+    appName:    'Lists',
+    cssClass:   getCssClass('Lists'),
+    msgText:    'No list elements (' + selectors + ') found.',
     targetList: targetList,
     getInfo:    getInfo,
     dndFlag:    true
