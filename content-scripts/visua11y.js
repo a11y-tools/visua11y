@@ -36,305 +36,6 @@ function runSelectedApp (selection) {
 chrome.runtime.onMessage.addListener(visua11y);
 
 /*
-*   forms.js: highlight form-related elements
-*/
-
-function initForms () {
-
-  addPolyfills();
-
-  let targetList = [
-    {selector: "button",   color: "purple", label: "button"},
-    {selector: "input",    color: "navy",   label: "input"},
-    {selector: "keygen",   color: "gray",   label: "keygen"},
-    {selector: "meter",    color: "maroon", label: "meter"},
-    {selector: "output",   color: "teal",   label: "output"},
-    {selector: "progress", color: "olive",  label: "progress"},
-    {selector: "select",   color: "green",  label: "select"},
-    {selector: "textarea", color: "brown",  label: "textarea"}
-  ];
-
-  let selectors = targetList.map(function (tgt) {return '<li>' + tgt.selector + '</li>';}).join('');
-
-  function getInfo (element, target) {
-    return new InfoObject(element, 'FORM INFO');
-  }
-
-  let params = {
-    appName:    "Forms",
-    cssClass:   getCssClass("Forms"),
-    msgText:    "No form-related elements found: <ul>" + selectors + "</ul>",
-    targetList: targetList,
-    getInfo:    getInfo,
-    dndFlag:    true
-  };
-
-  return new Bookmarklet(params);
-}
-
-/*
-*   headings.js: highlight heading elements
-*/
-
-function initHeadings () {
-
-  addPolyfills();
-
-  let targetList = [
-    {selector: "h1", color: "navy",   label: "h1"},
-    {selector: "h2", color: "olive",  label: "h2"},
-    {selector: "h3", color: "purple", label: "h3"},
-    {selector: "h4", color: "green",  label: "h4"},
-    {selector: "h5", color: "gray",   label: "h5"},
-    {selector: "h6", color: "brown",  label: "h6"}
-  ];
-
-  let selectors = targetList.map(function (tgt) {return tgt.selector;}).join(', ');
-
-  function getInfo (element, target) {
-    let info = new InfoObject(element, 'HEADING INFO');
-    info.addProps('level ' + target.label.substring(1));
-    return info;
-  }
-
-  let params = {
-    appName:    "Headings",
-    cssClass:   getCssClass("Headings"),
-    msgText:    "No heading elements (" + selectors + ") found.",
-    targetList: targetList,
-    getInfo:    getInfo,
-    dndFlag:    true
-  };
-
-  return new Bookmarklet(params);
-}
-
-/*
-*   images.js: highlight image elements
-*/
-
-function initImages () {
-
-  addPolyfills();
-
-  let targetList = [
-    {selector: "area", color: "teal",   label: "area"},
-    {selector: "img",  color: "olive",  label: "img"},
-    {selector: "svg",  color: "purple", label: "svg"}
-  ];
-
-  let selectors = targetList.map(function (tgt) {return tgt.selector;}).join(', ');
-
-  function getInfo (element, target) {
-    return new InfoObject(element, 'IMAGE INFO');
-  }
-
-  let params = {
-    appName:    "Images",
-    cssClass:   getCssClass("Images"),
-    msgText:    "No image elements (" + selectors + ") found.",
-    targetList: targetList,
-    getInfo:    getInfo,
-    dndFlag:    true
-  };
-
-  return new Bookmarklet(params);
-}
-
-/*
-*   landmarks.js: highlight ARIA landmarks
-*/
-
-function initLandmarks () {
-
-  addPolyfills();
-
-  // Filter function called on a list of elements returned by selector
-  // 'footer, [role="contentinfo"]'. It returns true for the following
-  // conditions: (1) element IS NOT a footer element; (2) element IS a
-  // footer element AND IS NOT a descendant of article or section.
-  function isContentinfo (element) {
-    if (element.tagName.toLowerCase() !== 'footer') return true;
-    if (!isDescendantOf(element, ['article', 'section'])) return true;
-    return false;
-  }
-
-  // Filter function called on a list of elements returned by selector
-  // 'header, [role="banner"]'. It returns true for the following
-  // conditions: (1) element IS NOT a header element; (2) element IS a
-  // header element AND IS NOT a descendant of article or section.
-  function isBanner (element) {
-    if (element.tagName.toLowerCase() !== 'header') return true;
-    if (!isDescendantOf(element, ['article', 'section'])) return true;
-    return false;
-  }
-
-  let targetList = [
-    {selector: 'aside:not([role]), [role~="complementary"], [role~="COMPLEMENTARY"]',         color: "maroon", label: "complementary"},
-    {selector: 'footer, [role~="contentinfo"], [role~="CONTENTINFO"]', filter: isContentinfo, color: "olive",  label: "contentinfo"},
-    {selector: '[role~="application"], [role~="APPLICATION"]',                                color: "black",  label: "application"},
-    {selector: 'nav, [role~="navigation"], [role~="NAVIGATION"]',                             color: "green",  label: "navigation"},
-    {selector: '[role~="region"][aria-labelledby], [role~="REGION"][aria-labelledby]',        color: "teal",   label: "region"},
-    {selector: '[role~="region"][aria-label], [role~="REGION"][aria-label]',                  color: "teal",   label: "region"},
-    {selector: 'section[aria-labelledby], section[aria-label]',                               color: "teal",   label: "region"},
-    {selector: 'header, [role~="banner"], [role~="BANNER"]', filter: isBanner,                color: "gray",   label: "banner"},
-    {selector: '[role~="search"], [role~="SEARCH"]',                                          color: "purple", label: "search"},
-    {selector: 'main, [role~="main"], [role~="MAIN"]',                                        color: "navy",   label: "main"}
-  ];
-
-  let selectors = targetList.map(function (tgt) {return '<li>' + tgt.selector + '</li>';}).join('');
-
-  function getInfo (element, target) {
-    return new InfoObject(element, 'LANDMARK INFO');
-  }
-
-  let params = {
-    appName:    "Landmarks",
-    cssClass:   getCssClass("Landmarks"),
-    msgText:    "No elements with ARIA Landmark roles found: <ul>" + selectors + "</ul>",
-    targetList: targetList,
-    getInfo:    getInfo,
-    dndFlag:    true
-  };
-
-  return new Bookmarklet(params);
-}
-
-/*
-*   lists.js: highlight list elements
-*/
-
-function initLists () {
-
-  addPolyfills();
-
-  let targetList = [
-    {selector: "dl", color: "olive",  label: "dl"},
-    {selector: "ol", color: "purple", label: "ol"},
-    {selector: "ul", color: "navy",   label: "ul"}
-  ];
-
-  let selectors = targetList.map(function (tgt) {return tgt.selector;}).join(', ');
-
-  function getInfo (element, target) {
-    let listCount;
-
-    switch (target.label) {
-      case 'dl':
-        listCount = countChildrenWithTagNames(element, ['DT', 'DD']);
-        break;
-      case 'ol':
-      case 'ul':
-        listCount = countChildrenWithTagNames(element, ['LI']);
-        break;
-    }
-
-    let info = new InfoObject(element, 'LIST INFO');
-    info.addProps(listCount + ' items');
-    return info;
-  }
-
-  let params = {
-    appName:    "Lists",
-    cssClass:   getCssClass("Lists"),
-    msgText:    "No list elements (" + selectors + ") found.",
-    targetList: targetList,
-    getInfo:    getInfo,
-    dndFlag:    true
-  };
-
-  return new Bookmarklet(params);
-}
-
-/*
-*   Bookmarklet.js
-*/
-
-/* eslint no-console: 0 */
-function logVersionInfo (appName) {
-  console.log(getTitle() + ' : v' + getVersion() + ' : ' + appName);
-}
-
-function Bookmarklet (params) {
-  let globalName = getGlobalName(params.appName);
-
-  // use singleton pattern
-  if (typeof window[globalName] === 'object')
-    return window[globalName];
-
-  this.appName  = params.appName;
-  this.cssClass = params.cssClass;
-  this.msgText  = params.msgText;
-  this.params   = params;
-  this.show     = false;
-
-  let dialog = new MessageDialog();
-  window.addEventListener('resize', event => {
-    removeNodes(this.cssClass);
-    dialog.resize();
-    this.show = false;
-  });
-
-  window[globalName] = this;
-  logVersionInfo(this.appName);
-}
-
-Bookmarklet.prototype.run = function () {
-  let dialog = new MessageDialog();
-
-  dialog.hide();
-  this.show = !this.show;
-
-  if (this.show) {
-    if (addNodes(this.params) === 0) {
-      dialog.show(this.appName, this.msgText);
-      this.show = false;
-    }
-  }
-  else {
-    removeNodes(this.cssClass);
-  }
-};
-
-/*
-*   InfoObject.js
-*/
-
-/*
-*  nameIncludesDescription: Determine whether accName object's name
-*  property includes the accDesc object's name property content.
-*/
-function nameIncludesDescription (accName, accDesc) {
-  if (accName === null || accDesc === null) return false;
-
-  let name = accName.name, desc = accDesc.name;
-  if (typeof name === 'string' && typeof desc === 'string') {
-    return name.toLowerCase().includes(desc.toLowerCase());
-  }
-
-  return false;
-}
-
-function InfoObject (element, title) {
-  this.title     = title;
-  this.element   = getElementInfo(element);
-  this.grpLabels = getGroupingLabels(element);
-  this.accName   = getAccessibleName(element);
-  this.accDesc   = getAccessibleDesc(element);
-  this.role      = getAriaRole(element);
-
-  // Ensure that accessible description is not a duplication
-  // of accessible name content. If it is, nullify the desc.
-  if (nameIncludesDescription (this.accName, this.accDesc)) {
-    this.accDesc = null;
-  }
-}
-
-InfoObject.prototype.addProps = function (val) {
-  this.props = val;
-}
-
-/*
 *   constants.js
 */
 
@@ -342,7 +43,7 @@ var CONSTANTS = {};
 Object.defineProperty(CONSTANTS, 'classPrefix',  { value: 'a11yGfdXALm' });
 Object.defineProperty(CONSTANTS, 'globalPrefix', { value: 'a11y' });
 Object.defineProperty(CONSTANTS, 'title',        { value: 'oaa-tools/bookmarklets' });
-Object.defineProperty(CONSTANTS, 'version',      { value: '0.2.2' });
+Object.defineProperty(CONSTANTS, 'version',      { value: '0.3.0' });
 
 function getCssClass (appName) {
   const prefix = CONSTANTS.classPrefix;
@@ -367,99 +68,7 @@ function getTitle ()   { return CONSTANTS.title }
 function getVersion () { return CONSTANTS.version }
 
 /*
-*   dialog.js: functions for creating, modifying and deleting message dialog
-*/
-
-/*
-*   setBoxGeometry: Set the width and position of message dialog based on
-*   the width of the browser window. Called by functions resizeMessage and
-*   createMsgOverlay.
-*/
-function setBoxGeometry (dialog) {
-  let width  = window.innerWidth / 3.2;
-  let left   = window.innerWidth / 2 - width / 2;
-  let scroll = getScrollOffsets();
-
-  dialog.style.width = width + "px";
-  dialog.style.left  = (scroll.x + left) + "px";
-  dialog.style.top   = (scroll.y + 30) + "px";
-}
-
-/*
-*   createMsgDialog: Construct and position the message dialog whose
-*   purpose is to alert the user when no target elements are found by
-*   a bookmarklet.
-*/
-function createMsgDialog (cssClass, handler) {
-  let dialog = document.createElement("div");
-  let button  = document.createElement("button");
-
-  dialog.className = cssClass;
-  setBoxGeometry(dialog);
-
-  button.onclick = handler;
-
-  dialog.appendChild(button);
-  document.body.appendChild(dialog);
-  return dialog;
-}
-
-/*
-*   deleteMsgDialog: Use reference to delete message dialog.
-*/
-function deleteMsgDialog (dialog) {
-  if (dialog) document.body.removeChild(dialog);
-}
-
-/*
-*   MessageDialog: Wrapper for show, hide and resize methods
-*/
-function MessageDialog () {
-  this.GLOBAL_NAME = 'a11yMessageDialog';
-  this.CSS_CLASS = 'oaa-message-dialog';
-}
-
-/*
-*   show: show message dialog
-*/
-MessageDialog.prototype.show = function (title, message) {
-  const MSG_DIALOG = this.GLOBAL_NAME;
-  let h2, div;
-
-  if (!window[MSG_DIALOG])
-    window[MSG_DIALOG] = createMsgDialog(this.CSS_CLASS, event => this.hide());
-
-  h2 = document.createElement("h2");
-  h2.innerHTML = title;
-  window[MSG_DIALOG].appendChild(h2);
-
-  div = document.createElement("div");
-  div.innerHTML = message;
-  window[MSG_DIALOG].appendChild(div);
-};
-
-/*
-*   hide: hide message dialog
-*/
-MessageDialog.prototype.hide = function () {
-  const MSG_DIALOG = this.GLOBAL_NAME;
-  if (window[MSG_DIALOG]) {
-    deleteMsgDialog(window[MSG_DIALOG]);
-    delete(window[MSG_DIALOG]);
-  }
-};
-
-/*
-*   resize: resize message dialog
-*/
-MessageDialog.prototype.resize = function () {
-  const MSG_DIALOG = this.GLOBAL_NAME;
-  if (window[MSG_DIALOG])
-    setBoxGeometry(window[MSG_DIALOG]);
-};
-
-/*
-*   dom.js: functions and constants for adding and removing DOM overlay elements
+*   dom.js: functions for getting information about DOM elements
 */
 
 /*
@@ -530,55 +139,302 @@ function hasParentWithName (element, tagNames) {
 }
 
 /*
-*   addNodes: Use targetList to generate nodeList of elements and to
-*   each of these, add an overlay with a unique CSS class name.
-*   Optionally, if getInfo is specified, add tooltip information;
-*   if dndFlag is set, add drag-and-drop functionality.
+*   roles.js
+*
+*   Note: The information in this module is based on the following documents:
+*   1. ARIA in HTML (https://specs.webplatform.org/html-aria/webspecs/master/)
+*   2. WAI-ARIA 1.1 (http://www.w3.org/TR/wai-aria-1.1/)
+*   3. WAI-ARIA 1.0 (http://www.w3.org/TR/wai-aria/)
 */
-function addNodes (params) {
-  let targetList = params.targetList,
-      cssClass = params.cssClass,
-      getInfo = params.getInfo,
-      evalInfo = params.evalInfo,
-      dndFlag = params.dndFlag;
-  let counter = 0;
 
-  targetList.forEach(function (target) {
-    // Collect elements based on selector defined for target
-    let elements = document.querySelectorAll(target.selector);
+/*
+*   inListOfOptions: Determine whether element is a child of
+*   1. a select element
+*   2. an optgroup element that is a child of a select element
+*   3. a datalist element
+*/
+function inListOfOptions (element) {
+  let parent = element.parentElement,
+      parentName = parent.tagName.toLowerCase(),
+      parentOfParentName = parent.parentElement.tagName.toLowerCase();
 
-    // Filter elements if target defines a filter function
-    if (typeof target.filter === 'function')
-      elements = Array.prototype.filter.call(elements, target.filter);
+  if (parentName === 'select')
+    return true;
 
-    Array.prototype.forEach.call(elements, function (element) {
-      if (isVisible(element)) {
-        let info = getInfo(element, target);
-        if (evalInfo) evalInfo(info, target);
-        let boundingRect = element.getBoundingClientRect();
-        let overlayNode = createOverlay(target, boundingRect, cssClass);
-        if (dndFlag) addDragAndDrop(overlayNode);
-        let labelNode = overlayNode.firstChild;
-        labelNode.title = formatInfo(info);
-        document.body.appendChild(overlayNode);
-        counter += 1;
-      }
-    });
-  });
+  if (parentName === 'optgroup' && parentOfParentName === 'select')
+    return true;
 
-  return counter;
+  if (parentName === 'datalist')
+    return true;
+
+  return false;
 }
 
 /*
-*   removeNodes: Use the unique CSS class name supplied to addNodes
-*   to remove all instances of the overlay nodes.
+*   validRoles: Reference list of all concrete ARIA roles as specified in
+*   WAI-ARIA 1.1 Working Draft of 14 July 2015
 */
-function removeNodes (cssClass) {
-  let selector = "div." + cssClass;
-  let elements = document.querySelectorAll(selector);
-  Array.prototype.forEach.call(elements, function (element) {
-    document.body.removeChild(element);
-  });
+var validRoles = [
+
+  // LANDMARK
+  'application',
+  'banner',
+  'complementary',
+  'contentinfo',
+  'form',
+  'main',
+  'navigation',
+  'search',
+
+  // WIDGET
+  'alert',
+  'alertdialog',
+  'button',
+  'checkbox',
+  'dialog',
+  'gridcell',
+  'link',
+  'log',
+  'marquee',
+  'menuitem',
+  'menuitemcheckbox',
+  'menuitemradio',
+  'option',
+  'progressbar',
+  'radio',
+  'scrollbar',
+  'searchbox',             // ARIA 1.1
+  'slider',
+  'spinbutton',
+  'status',
+  'switch',                // ARIA 1.1
+  'tab',
+  'tabpanel',
+  'textbox',
+  'timer',
+  'tooltip',
+  'treeitem',
+
+  // COMPOSITE WIDGET
+  'combobox',
+  'grid',
+  'listbox',
+  'menu',
+  'menubar',
+  'radiogroup',
+  'tablist',
+  'tree',
+  'treegrid',
+
+  // DOCUMENT STRUCTURE
+  'article',
+  'cell',                  // ARIA 1.1
+  'columnheader',
+  'definition',
+  'directory',
+  'document',
+  'group',
+  'heading',
+  'img',
+  'list',
+  'listitem',
+  'math',
+  'none',                  // ARIA 1.1
+  'note',
+  'presentation',
+  'region',
+  'row',
+  'rowgroup',
+  'rowheader',
+  'separator',
+  'table',                 // ARIA 1.1
+  'text',                  // ARIA 1.1
+  'toolbar'
+];
+
+/*
+*   getValidRole: Examine each value in space-separated list by attempting
+*   to find its match in the validRoles array. If a match is found, return
+*   it. Otherwise, return null.
+*/
+function getValidRole (spaceSepList) {
+  let arr = spaceSepList.split(' ');
+
+  for (let i = 0; i < arr.length; i++) {
+    let value = arr[i].toLowerCase();
+    let validRole = validRoles.find(role => role === value);
+    if (validRole) return validRole;
+  }
+
+  return null;
+}
+
+/*
+*   getAriaRole: Get the value of the role attribute, if it is present. If
+*   not specified, get the default role of element if it has one. Based on
+*   ARIA in HTML as of 21 October 2015.
+*/
+function getAriaRole (element) {
+  let tagName = element.tagName.toLowerCase(),
+      type    = element.type;
+
+  if (element.hasAttribute('role')) {
+    return getValidRole(getAttributeValue(element, 'role'));
+  }
+
+  switch (tagName) {
+
+    case 'a':
+      if (element.hasAttribute('href'))
+        return 'link';
+      break;
+
+    case 'area':
+      if (element.hasAttribute('href'))
+        return 'link';
+      break;
+
+    case 'article':     return 'article';
+    case 'aside':       return 'complementary';
+    case 'body':        return 'document';
+    case 'button':      return 'button';
+    case 'datalist':    return 'listbox';
+    case 'details':     return 'group';
+    case 'dialog':      return 'dialog';
+    case 'dl':          return 'list';
+    case 'fieldset':    return 'group';
+
+    case 'footer':
+      if (!isDescendantOf(element, ['article', 'section']))
+        return 'contentinfo';
+      break;
+
+    case 'form':        return 'form';
+
+    case 'h1':          return 'heading';
+    case 'h2':          return 'heading';
+    case 'h3':          return 'heading';
+    case 'h4':          return 'heading';
+    case 'h5':          return 'heading';
+    case 'h6':          return 'heading';
+
+    case 'header':
+      if (!isDescendantOf(element, ['article', 'section']))
+        return 'banner';
+      break;
+
+    case 'hr':          return 'separator';
+
+    case 'img':
+      if (!hasEmptyAltText(element))
+        return 'img';
+      break;
+
+    case 'input':
+      if (type === 'button')    return 'button';
+      if (type === 'checkbox')  return 'checkbox';
+      if (type === 'email')     return (element.hasAttribute('list')) ? 'combobox' : 'textbox';
+      if (type === 'image')     return 'button';
+      if (type === 'number')    return 'spinbutton';
+      if (type === 'password')  return 'textbox';
+      if (type === 'radio')     return 'radio';
+      if (type === 'range')     return 'slider';
+      if (type === 'reset')     return 'button';
+      if (type === 'search')    return (element.hasAttribute('list')) ? 'combobox' : 'textbox';
+      if (type === 'submit')    return 'button';
+      if (type === 'tel')       return (element.hasAttribute('list')) ? 'combobox' : 'textbox';
+      if (type === 'text')      return (element.hasAttribute('list')) ? 'combobox' : 'textbox';
+      if (type === 'url')       return (element.hasAttribute('list')) ? 'combobox' : 'textbox';
+      break;
+
+    case 'li':
+      if (hasParentWithName(element, ['ol', 'ul']))
+        return 'listitem';
+      break;
+
+    case 'link':
+      if (element.hasAttribute('href'))
+        return 'link';
+      break;
+
+    case 'main':      return 'main';
+
+    case 'menu':
+      if (type === 'toolbar')
+        return 'toolbar';
+      break;
+
+    case 'menuitem':
+      if (type === 'command')   return 'menuitem';
+      if (type === 'checkbox')  return 'menuitemcheckbox';
+      if (type === 'radio')     return 'menuitemradio';
+      break;
+
+    case 'meter':       return 'progressbar';
+    case 'nav':         return 'navigation';
+    case 'ol':          return 'list';
+
+    case 'option':
+      if (inListOfOptions(element))
+        return 'option';
+      break;
+
+    case 'output':      return 'status';
+    case 'progress':    return 'progressbar';
+    case 'section':     return 'region';
+    case 'select':      return 'listbox';
+    case 'summary':     return 'button';
+
+    case 'tbody':       return 'rowgroup';
+    case 'tfoot':       return 'rowgroup';
+    case 'thead':       return 'rowgroup';
+
+    case 'textarea':    return 'textbox';
+
+    // TODO: th can have role 'columnheader' or 'rowheader'
+    case 'th':          return 'columnheader';
+
+    case 'ul':          return 'list';
+  }
+
+  return null;
+}
+
+/*
+*   nameFromIncludesContents: Determine whether the ARIA role of element
+*   specifies that its 'name from' includes 'contents'.
+*/
+function nameFromIncludesContents (element) {
+  let elementRole = getAriaRole(element);
+  if (elementRole === null) return false;
+
+  let contentsRoles = [
+    'button',
+    'cell',                // ARIA 1.1
+    'checkbox',
+    'columnheader',
+    'directory',
+    'gridcell',
+    'heading',
+    'link',
+    'listitem',
+    'menuitem',
+    'menuitemcheckbox',
+    'menuitemradio',
+    'option',
+    'radio',
+    'row',
+    'rowgroup',
+    'rowheader',
+    'switch',              // ARIA 1.1
+    'tab',
+    'text',                // ARIA 1.1
+    'tooltip',
+    'treeitem'
+  ];
+
+  let contentsRole = contentsRoles.find(role => role === elementRole);
+  return (typeof contentsRole !== 'undefined');
 }
 
 /*
@@ -722,6 +578,322 @@ function getEmbeddedControlValue (element) {
   }
 
   return '';
+}
+
+/*
+*   namefrom.js
+*/
+
+// LOW-LEVEL FUNCTIONS
+
+/*
+*   normalize: Trim leading and trailing whitespace and condense all
+*   interal sequences of whitespace to a single space. Adapted from
+*   Mozilla documentation on String.prototype.trim polyfill. Handles
+*   BOM and NBSP characters.
+*/
+function normalize (s) {
+  let rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;
+  return s.replace(rtrim, '').replace(/\s+/g, ' ');
+}
+
+/*
+*   getAttributeValue: Return attribute value if present on element,
+*   otherwise return empty string.
+*/
+function getAttributeValue (element, attribute) {
+  let value = element.getAttribute(attribute);
+  return (value === null) ? '' : normalize(value);
+}
+
+/*
+*   couldHaveAltText: Based on HTML5 specification, determine whether
+*   element could have an 'alt' attribute.
+*/
+function couldHaveAltText (element) {
+  let tagName = element.tagName.toLowerCase();
+
+  switch (tagName) {
+    case 'img':
+    case 'area':
+      return true;
+    case 'input':
+      return (element.type && element.type === 'image');
+  }
+
+  return false;
+}
+
+/*
+*   hasEmptyAltText: Determine whether the alt attribute is present
+*   and its value is the empty string.
+*/
+function hasEmptyAltText (element) {
+  let value = element.getAttribute('alt');
+
+   // Attribute is present
+  if (value !== null)
+    return (normalize(value).length === 0);
+
+  return false;
+}
+
+/*
+*   isLabelableElement: Based on HTML5 specification, determine whether
+*   element can be associated with a label.
+*/
+function isLabelableElement (element) {
+  let tagName = element.tagName.toLowerCase(),
+      type    = element.type;
+
+  switch (tagName) {
+    case 'input':
+      return (type !== 'hidden');
+    case 'button':
+    case 'keygen':
+    case 'meter':
+    case 'output':
+    case 'progress':
+    case 'select':
+    case 'textarea':
+      return true;
+    default:
+      return false;
+  }
+}
+
+/*
+*   addCssGeneratedContent: Add CSS-generated content for pseudo-elements
+*   :before and :after. According to the CSS spec, test that content value
+*   is other than the default computed value of 'none'.
+*
+*   Note: Even if an author specifies content: 'none', because browsers add
+*   the double-quote character to the beginning and end of computed string
+*   values, the result cannot and will not be equal to 'none'.
+*/
+function addCssGeneratedContent (element, contents) {
+  let result = contents,
+      prefix = getComputedStyle(element, ':before').content,
+      suffix = getComputedStyle(element, ':after').content;
+
+  if (prefix !== 'none') result = prefix + result;
+  if (suffix !== 'none') result = result + suffix;
+
+  return result;
+}
+
+/*
+*   getNodeContents: Recursively process element and text nodes by aggregating
+*   their text values for an ARIA text equivalent calculation.
+*   1. This includes special handling of elements with 'alt' text and embedded
+*      controls.
+*   2. The forElem parameter is needed for label processing to avoid inclusion
+*      of an embedded control's value when the label is for the control itself.
+*/
+function getNodeContents (node, forElem) {
+  let contents = '';
+
+  if (node === forElem) return '';
+
+  switch (node.nodeType) {
+    case Node.ELEMENT_NODE:
+      if (couldHaveAltText(node)) {
+        contents = getAttributeValue(node, 'alt');
+      }
+      else if (isEmbeddedControl(node)) {
+        contents = getEmbeddedControlValue(node);
+      }
+      else {
+        if (node.hasChildNodes()) {
+          let children = node.childNodes,
+              arr = [];
+
+          for (let i = 0; i < children.length; i++) {
+            let nc = getNodeContents(children[i], forElem);
+            if (nc.length) arr.push(nc);
+          }
+
+          contents = (arr.length) ? arr.join(' ') : '';
+        }
+      }
+      // For all branches of the ELEMENT_NODE case...
+      contents = addCssGeneratedContent(node, contents);
+      break;
+
+    case Node.TEXT_NODE:
+      contents = normalize(node.textContent);
+  }
+
+  return contents;
+}
+
+/*
+*   getElementContents: Construct the ARIA text alternative for element by
+*   processing its element and text node descendants and then adding any CSS-
+*   generated content if present.
+*/
+function getElementContents (element, forElement) {
+  let result = '';
+
+  if (element.hasChildNodes()) {
+    let children = element.childNodes,
+        arrayOfStrings = [];
+
+    for (let i = 0; i < children.length; i++) {
+      let contents = getNodeContents(children[i], forElement);
+      if (contents.length) arrayOfStrings.push(contents);
+    }
+
+    result = (arrayOfStrings.length) ? arrayOfStrings.join(' ') : '';
+  }
+
+  return addCssGeneratedContent(element, result);
+}
+
+/*
+*   getContentsOfChildNodes: Using predicate function for filtering element
+*   nodes, collect text content from all child nodes of element.
+*/
+function getContentsOfChildNodes (element, predicate) {
+  let arr = [], content;
+
+  Array.prototype.forEach.call(element.childNodes, function (node) {
+    switch (node.nodeType) {
+      case (Node.ELEMENT_NODE):
+        if (predicate(node)) {
+          content = getElementContents(node);
+          if (content.length) arr.push(content);
+        }
+        break;
+      case (Node.TEXT_NODE):
+        content = normalize(node.textContent);
+        if (content.length) arr.push(content);
+        break;
+    }
+  });
+
+  if (arr.length) return arr.join(' ');
+  return '';
+}
+
+// HIGHER-LEVEL FUNCTIONS THAT RETURN AN OBJECT WITH SOURCE PROPERTY
+
+/*
+*   nameFromAttribute
+*/
+function nameFromAttribute (element, attribute) {
+  let name;
+
+  name = getAttributeValue(element, attribute);
+  if (name.length) return { name: name, source: attribute };
+
+  return null;
+}
+
+/*
+*   nameFromAltAttribute
+*/
+function nameFromAltAttribute (element) {
+  let name = element.getAttribute('alt');
+
+  // Attribute is present
+  if (name !== null) {
+    name = normalize(name);
+    return (name.length) ?
+      { name: name, source: 'alt' } :
+      { name: '<empty>', source: 'alt' };
+  }
+
+  // Attribute not present
+  return null;
+}
+
+/*
+*   nameFromContents
+*/
+function nameFromContents (element) {
+  let name;
+
+  name = getElementContents(element);
+  if (name.length) return { name: name, source: 'contents' };
+
+  return null;
+}
+
+/*
+*   nameFromDefault
+*/
+function nameFromDefault (name) {
+  return name.length ? { name: name, source: 'default' } : null;
+}
+
+/*
+*   nameFromDescendant
+*/
+function nameFromDescendant (element, tagName) {
+  let descendant = element.querySelector(tagName);
+  if (descendant) {
+    let name = getElementContents(descendant);
+    if (name.length) return { name: name, source: tagName + ' element' };
+  }
+
+  return null;
+}
+
+/*
+*   nameFromLabelElement
+*/
+function nameFromLabelElement (element) {
+  let name, label;
+
+  // label [for=id]
+  if (element.id) {
+    label = document.querySelector('[for="' + element.id + '"]');
+    if (label) {
+      name = getElementContents(label, element);
+      if (name.length) return { name: name, source: 'label reference' };
+    }
+  }
+
+  // label encapsulation
+  if (typeof element.closest === 'function') {
+    label = element.closest('label');
+    if (label) {
+      name = getElementContents(label, element);
+      if (name.length) return { name: name, source: 'label encapsulation' };
+    }
+  }
+
+  return null;
+}
+
+/*
+*   nameFromDetailsOrSummary: If element is expanded (has open attribute),
+*   return the contents of the summary element followed by the text contents
+*   of element and all of its non-summary child elements. Otherwise, return
+*   only the contents of the first summary element descendant.
+*/
+function nameFromDetailsOrSummary (element) {
+  let name, summary;
+
+  function isExpanded (elem) { return elem.hasAttribute('open'); }
+
+  // At minimum, always use summary contents
+  summary = element.querySelector('summary');
+  if (summary) name = getElementContents(summary);
+
+  // Return either summary + details (non-summary) or summary only
+  if (isExpanded(element)) {
+    name += getContentsOfChildNodes(element, function (elem) {
+      return elem.tagName.toLowerCase() !== 'summary';
+    });
+    if (name.length) return { name: name, source: 'contents' };
+  }
+  else {
+    if (name.length) return { name: name, source: 'summary element' };
+  }
+
+  return null;
 }
 
 /*
@@ -1063,684 +1235,6 @@ function formatInfo (info) {
 }
 
 /*
-*   namefrom.js
-*/
-
-// LOW-LEVEL FUNCTIONS
-
-/*
-*   normalize: Trim leading and trailing whitespace and condense all
-*   interal sequences of whitespace to a single space. Adapted from
-*   Mozilla documentation on String.prototype.trim polyfill. Handles
-*   BOM and NBSP characters.
-*/
-function normalize (s) {
-  let rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;
-  return s.replace(rtrim, '').replace(/\s+/g, ' ');
-}
-
-/*
-*   getAttributeValue: Return attribute value if present on element,
-*   otherwise return empty string.
-*/
-function getAttributeValue (element, attribute) {
-  let value = element.getAttribute(attribute);
-  return (value === null) ? '' : normalize(value);
-}
-
-/*
-*   couldHaveAltText: Based on HTML5 specification, determine whether
-*   element could have an 'alt' attribute.
-*/
-function couldHaveAltText (element) {
-  let tagName = element.tagName.toLowerCase();
-
-  switch (tagName) {
-    case 'img':
-    case 'area':
-      return true;
-    case 'input':
-      return (element.type && element.type === 'image');
-  }
-
-  return false;
-}
-
-/*
-*   hasEmptyAltText: Determine whether the alt attribute is present
-*   and its value is the empty string.
-*/
-function hasEmptyAltText (element) {
-  let value = element.getAttribute('alt');
-
-   // Attribute is present
-  if (value !== null)
-    return (normalize(value).length === 0);
-
-  return false;
-}
-
-/*
-*   isLabelableElement: Based on HTML5 specification, determine whether
-*   element can be associated with a label.
-*/
-function isLabelableElement (element) {
-  let tagName = element.tagName.toLowerCase(),
-      type    = element.type;
-
-  switch (tagName) {
-    case 'input':
-      return (type !== 'hidden');
-    case 'button':
-    case 'keygen':
-    case 'meter':
-    case 'output':
-    case 'progress':
-    case 'select':
-    case 'textarea':
-      return true;
-    default:
-      return false;
-  }
-}
-
-/*
-*   addCssGeneratedContent: Add CSS-generated content for pseudo-elements
-*   :before and :after. According to the CSS spec, test that content value
-*   is other than the default computed value of 'none'.
-*
-*   Note: Even if an author specifies content: 'none', because browsers add
-*   the double-quote character to the beginning and end of computed string
-*   values, the result cannot and will not be equal to 'none'.
-*/
-function addCssGeneratedContent (element, contents) {
-  let result = contents,
-      prefix = getComputedStyle(element, ':before').content,
-      suffix = getComputedStyle(element, ':after').content;
-
-  if (prefix !== 'none') result = prefix + result;
-  if (suffix !== 'none') result = result + suffix;
-
-  return result;
-}
-
-/*
-*   getNodeContents: Recursively process element and text nodes by aggregating
-*   their text values for an ARIA text equivalent calculation.
-*   1. This includes special handling of elements with 'alt' text and embedded
-*      controls.
-*   2. The forElem parameter is needed for label processing to avoid inclusion
-*      of an embedded control's value when the label is for the control itself.
-*/
-function getNodeContents (node, forElem) {
-  let contents = '';
-
-  if (node === forElem) return '';
-
-  switch (node.nodeType) {
-    case Node.ELEMENT_NODE:
-      if (couldHaveAltText(node)) {
-        contents = getAttributeValue(node, 'alt');
-      }
-      else if (isEmbeddedControl(node)) {
-        contents = getEmbeddedControlValue(node);
-      }
-      else {
-        if (node.hasChildNodes()) {
-          let children = node.childNodes,
-              arr = [];
-
-          for (let i = 0; i < children.length; i++) {
-            let nc = getNodeContents(children[i], forElem);
-            if (nc.length) arr.push(nc);
-          }
-
-          contents = (arr.length) ? arr.join(' ') : '';
-        }
-      }
-      // For all branches of the ELEMENT_NODE case...
-      contents = addCssGeneratedContent(node, contents);
-      break;
-
-    case Node.TEXT_NODE:
-      contents = normalize(node.textContent);
-  }
-
-  return contents;
-}
-
-/*
-*   getElementContents: Construct the ARIA text alternative for element by
-*   processing its element and text node descendants and then adding any CSS-
-*   generated content if present.
-*/
-function getElementContents (element, forElement) {
-  let result = '';
-
-  if (element.hasChildNodes()) {
-    let children = element.childNodes,
-        arrayOfStrings = [];
-
-    for (let i = 0; i < children.length; i++) {
-      let contents = getNodeContents(children[i], forElement);
-      if (contents.length) arrayOfStrings.push(contents);
-    }
-
-    result = (arrayOfStrings.length) ? arrayOfStrings.join(' ') : '';
-  }
-
-  return addCssGeneratedContent(element, result);
-}
-
-/*
-*   getContentsOfChildNodes: Using predicate function for filtering element
-*   nodes, collect text content from all child nodes of element.
-*/
-function getContentsOfChildNodes (element, predicate) {
-  let arr = [], content;
-
-  Array.prototype.forEach.call(element.childNodes, function (node) {
-    switch (node.nodeType) {
-      case (Node.ELEMENT_NODE):
-        if (predicate(node)) {
-          content = getElementContents(node);
-          if (content.length) arr.push(content);
-        }
-        break;
-      case (Node.TEXT_NODE):
-        content = normalize(node.textContent);
-        if (content.length) arr.push(content);
-        break;
-    }
-  });
-
-  if (arr.length) return arr.join(' ');
-  return '';
-}
-
-// HIGHER-LEVEL FUNCTIONS THAT RETURN AN OBJECT WITH SOURCE PROPERTY
-
-/*
-*   nameFromAttribute
-*/
-function nameFromAttribute (element, attribute) {
-  let name;
-
-  name = getAttributeValue(element, attribute);
-  if (name.length) return { name: name, source: attribute };
-
-  return null;
-}
-
-/*
-*   nameFromAltAttribute
-*/
-function nameFromAltAttribute (element) {
-  let name = element.getAttribute('alt');
-
-  // Attribute is present
-  if (name !== null) {
-    name = normalize(name);
-    return (name.length) ?
-      { name: name, source: 'alt' } :
-      { name: '<empty>', source: 'alt' };
-  }
-
-  // Attribute not present
-  return null;
-}
-
-/*
-*   nameFromContents
-*/
-function nameFromContents (element) {
-  let name;
-
-  name = getElementContents(element);
-  if (name.length) return { name: name, source: 'contents' };
-
-  return null;
-}
-
-/*
-*   nameFromDefault
-*/
-function nameFromDefault (name) {
-  return name.length ? { name: name, source: 'default' } : null;
-}
-
-/*
-*   nameFromDescendant
-*/
-function nameFromDescendant (element, tagName) {
-  let descendant = element.querySelector(tagName);
-  if (descendant) {
-    let name = getElementContents(descendant);
-    if (name.length) return { name: name, source: tagName + ' element' };
-  }
-
-  return null;
-}
-
-/*
-*   nameFromLabelElement
-*/
-function nameFromLabelElement (element) {
-  let name, label;
-
-  // label [for=id]
-  if (element.id) {
-    label = document.querySelector('[for="' + element.id + '"]');
-    if (label) {
-      name = getElementContents(label, element);
-      if (name.length) return { name: name, source: 'label reference' };
-    }
-  }
-
-  // label encapsulation
-  if (typeof element.closest === 'function') {
-    label = element.closest('label');
-    if (label) {
-      name = getElementContents(label, element);
-      if (name.length) return { name: name, source: 'label encapsulation' };
-    }
-  }
-
-  return null;
-}
-
-/*
-*   nameFromDetailsOrSummary: If element is expanded (has open attribute),
-*   return the contents of the summary element followed by the text contents
-*   of element and all of its non-summary child elements. Otherwise, return
-*   only the contents of the first summary element descendant.
-*/
-function nameFromDetailsOrSummary (element) {
-  let name, summary;
-
-  function isExpanded (elem) { return elem.hasAttribute('open'); }
-
-  // At minimum, always use summary contents
-  summary = element.querySelector('summary');
-  if (summary) name = getElementContents(summary);
-
-  // Return either summary + details (non-summary) or summary only
-  if (isExpanded(element)) {
-    name += getContentsOfChildNodes(element, function (elem) {
-      return elem.tagName.toLowerCase() !== 'summary';
-    });
-    if (name.length) return { name: name, source: 'contents' };
-  }
-  else {
-    if (name.length) return { name: name, source: 'summary element' };
-  }
-
-  return null;
-}
-
-/*
-*   overlay.js: functions for creating and modifying DOM overlay elements
-*/
-
-var zIndex = 100000;
-
-/*
-*   createOverlay: Create overlay div with size and position based on the
-*   boundingRect properties of its corresponding target element.
-*/
-function createOverlay (tgt, rect, cname) {
-  let scrollOffsets = getScrollOffsets();
-  const MINWIDTH  = 68;
-  const MINHEIGHT = 27;
-
-  let node = document.createElement("div");
-  node.setAttribute("class", [cname, 'oaa-element-overlay'].join(' '));
-  node.startLeft = (rect.left + scrollOffsets.x) + "px";
-  node.startTop  = (rect.top  + scrollOffsets.y) + "px";
-
-  node.style.left = node.startLeft;
-  node.style.top  = node.startTop;
-  node.style.width  = Math.max(rect.width, MINWIDTH) + "px";
-  node.style.height = Math.max(rect.height, MINHEIGHT) + "px";
-  node.style.borderColor = tgt.color;
-  node.style.zIndex = zIndex;
-
-  let label = document.createElement("div");
-  label.setAttribute("class", 'oaa-overlay-label');
-  label.style.backgroundColor = tgt.color;
-  label.innerHTML = tgt.label;
-
-  node.appendChild(label);
-  return node;
-}
-
-/*
-*   addDragAndDrop: Add drag-and-drop and reposition functionality to an
-*   overlay div element created by the createOverlay function.
-*/
-function addDragAndDrop (node) {
-
-  function hoistZIndex (el) {
-    let incr = 100;
-    el.style.zIndex = zIndex += incr;
-  }
-
-  function repositionOverlay (el) {
-    el.style.left = el.startLeft;
-    el.style.top  = el.startTop;
-  }
-
-  let labelDiv = node.firstChild;
-
-  labelDiv.onmousedown = function (event) {
-    drag(this.parentNode, hoistZIndex, event);
-  };
-
-  labelDiv.ondblclick = function (event) {
-    repositionOverlay(this.parentNode);
-  };
-}
-
-/*
-*   roles.js
-*
-*   Note: The information in this module is based on the following documents:
-*   1. ARIA in HTML (https://specs.webplatform.org/html-aria/webspecs/master/)
-*   2. WAI-ARIA 1.1 (http://www.w3.org/TR/wai-aria-1.1/)
-*   3. WAI-ARIA 1.0 (http://www.w3.org/TR/wai-aria/)
-*/
-
-/*
-*   inListOfOptions: Determine whether element is a child of
-*   1. a select element
-*   2. an optgroup element that is a child of a select element
-*   3. a datalist element
-*/
-function inListOfOptions (element) {
-  let parent = element.parentElement,
-      parentName = parent.tagName.toLowerCase(),
-      parentOfParentName = parent.parentElement.tagName.toLowerCase();
-
-  if (parentName === 'select')
-    return true;
-
-  if (parentName === 'optgroup' && parentOfParentName === 'select')
-    return true;
-
-  if (parentName === 'datalist')
-    return true;
-
-  return false;
-}
-
-/*
-*   validRoles: Reference list of all concrete ARIA roles as specified in
-*   WAI-ARIA 1.1 Working Draft of 14 July 2015
-*/
-var validRoles = [
-
-  // LANDMARK
-  'application',
-  'banner',
-  'complementary',
-  'contentinfo',
-  'form',
-  'main',
-  'navigation',
-  'search',
-
-  // WIDGET
-  'alert',
-  'alertdialog',
-  'button',
-  'checkbox',
-  'dialog',
-  'gridcell',
-  'link',
-  'log',
-  'marquee',
-  'menuitem',
-  'menuitemcheckbox',
-  'menuitemradio',
-  'option',
-  'progressbar',
-  'radio',
-  'scrollbar',
-  'searchbox',             // ARIA 1.1
-  'slider',
-  'spinbutton',
-  'status',
-  'switch',                // ARIA 1.1
-  'tab',
-  'tabpanel',
-  'textbox',
-  'timer',
-  'tooltip',
-  'treeitem',
-
-  // COMPOSITE WIDGET
-  'combobox',
-  'grid',
-  'listbox',
-  'menu',
-  'menubar',
-  'radiogroup',
-  'tablist',
-  'tree',
-  'treegrid',
-
-  // DOCUMENT STRUCTURE
-  'article',
-  'cell',                  // ARIA 1.1
-  'columnheader',
-  'definition',
-  'directory',
-  'document',
-  'group',
-  'heading',
-  'img',
-  'list',
-  'listitem',
-  'math',
-  'none',                  // ARIA 1.1
-  'note',
-  'presentation',
-  'region',
-  'row',
-  'rowgroup',
-  'rowheader',
-  'separator',
-  'table',                 // ARIA 1.1
-  'text',                  // ARIA 1.1
-  'toolbar'
-];
-
-/*
-*   getValidRole: Examine each value in space-separated list by attempting
-*   to find its match in the validRoles array. If a match is found, return
-*   it. Otherwise, return null.
-*/
-function getValidRole (spaceSepList) {
-  let arr = spaceSepList.split(' ');
-
-  for (let i = 0; i < arr.length; i++) {
-    let value = arr[i].toLowerCase();
-    let validRole = validRoles.find(role => role === value);
-    if (validRole) return validRole;
-  }
-
-  return null;
-}
-
-/*
-*   getAriaRole: Get the value of the role attribute, if it is present. If
-*   not specified, get the default role of element if it has one. Based on
-*   ARIA in HTML as of 21 October 2015.
-*/
-function getAriaRole (element) {
-  let tagName = element.tagName.toLowerCase(),
-      type    = element.type;
-
-  if (element.hasAttribute('role')) {
-    return getValidRole(getAttributeValue(element, 'role'));
-  }
-
-  switch (tagName) {
-
-    case 'a':
-      if (element.hasAttribute('href'))
-        return 'link';
-      break;
-
-    case 'area':
-      if (element.hasAttribute('href'))
-        return 'link';
-      break;
-
-    case 'article':     return 'article';
-    case 'aside':       return 'complementary';
-    case 'body':        return 'document';
-    case 'button':      return 'button';
-    case 'datalist':    return 'listbox';
-    case 'details':     return 'group';
-    case 'dialog':      return 'dialog';
-    case 'dl':          return 'list';
-    case 'fieldset':    return 'group';
-
-    case 'footer':
-      if (!isDescendantOf(element, ['article', 'section']))
-        return 'contentinfo';
-      break;
-
-    case 'form':        return 'form';
-
-    case 'h1':          return 'heading';
-    case 'h2':          return 'heading';
-    case 'h3':          return 'heading';
-    case 'h4':          return 'heading';
-    case 'h5':          return 'heading';
-    case 'h6':          return 'heading';
-
-    case 'header':
-      if (!isDescendantOf(element, ['article', 'section']))
-        return 'banner';
-      break;
-
-    case 'hr':          return 'separator';
-
-    case 'img':
-      if (!hasEmptyAltText(element))
-        return 'img';
-      break;
-
-    case 'input':
-      if (type === 'button')    return 'button';
-      if (type === 'checkbox')  return 'checkbox';
-      if (type === 'email')     return (element.hasAttribute('list')) ? 'combobox' : 'textbox';
-      if (type === 'image')     return 'button';
-      if (type === 'number')    return 'spinbutton';
-      if (type === 'password')  return 'textbox';
-      if (type === 'radio')     return 'radio';
-      if (type === 'range')     return 'slider';
-      if (type === 'reset')     return 'button';
-      if (type === 'search')    return (element.hasAttribute('list')) ? 'combobox' : 'textbox';
-      if (type === 'submit')    return 'button';
-      if (type === 'tel')       return (element.hasAttribute('list')) ? 'combobox' : 'textbox';
-      if (type === 'text')      return (element.hasAttribute('list')) ? 'combobox' : 'textbox';
-      if (type === 'url')       return (element.hasAttribute('list')) ? 'combobox' : 'textbox';
-      break;
-
-    case 'li':
-      if (hasParentWithName(element, ['ol', 'ul']))
-        return 'listitem';
-      break;
-
-    case 'link':
-      if (element.hasAttribute('href'))
-        return 'link';
-      break;
-
-    case 'main':      return 'main';
-
-    case 'menu':
-      if (type === 'toolbar')
-        return 'toolbar';
-      break;
-
-    case 'menuitem':
-      if (type === 'command')   return 'menuitem';
-      if (type === 'checkbox')  return 'menuitemcheckbox';
-      if (type === 'radio')     return 'menuitemradio';
-      break;
-
-    case 'meter':       return 'progressbar';
-    case 'nav':         return 'navigation';
-    case 'ol':          return 'list';
-
-    case 'option':
-      if (inListOfOptions(element))
-        return 'option';
-      break;
-
-    case 'output':      return 'status';
-    case 'progress':    return 'progressbar';
-    case 'section':     return 'region';
-    case 'select':      return 'listbox';
-    case 'summary':     return 'button';
-
-    case 'tbody':       return 'rowgroup';
-    case 'tfoot':       return 'rowgroup';
-    case 'thead':       return 'rowgroup';
-
-    case 'textarea':    return 'textbox';
-
-    // TODO: th can have role 'columnheader' or 'rowheader'
-    case 'th':          return 'columnheader';
-
-    case 'ul':          return 'list';
-  }
-
-  return null;
-}
-
-/*
-*   nameFromIncludesContents: Determine whether the ARIA role of element
-*   specifies that its 'name from' includes 'contents'.
-*/
-function nameFromIncludesContents (element) {
-  let elementRole = getAriaRole(element);
-  if (elementRole === null) return false;
-
-  let contentsRoles = [
-    'button',
-    'cell',                // ARIA 1.1
-    'checkbox',
-    'columnheader',
-    'directory',
-    'gridcell',
-    'heading',
-    'link',
-    'listitem',
-    'menuitem',
-    'menuitemcheckbox',
-    'menuitemradio',
-    'option',
-    'radio',
-    'row',
-    'rowgroup',
-    'rowheader',
-    'switch',              // ARIA 1.1
-    'tab',
-    'text',                // ARIA 1.1
-    'tooltip',
-    'treeitem'
-  ];
-
-  let contentsRole = contentsRoles.find(role => role === elementRole);
-  return (typeof contentsRole !== 'undefined');
-}
-
-/*
 *   utils.js: utility functions
 */
 
@@ -1883,4 +1377,587 @@ function addPolyfills () {
       }
     };
   }
+}
+
+/*
+*   overlay.js: functions for creating and modifying DOM overlay elements
+*/
+
+var zIndex = 100000;
+
+/*
+*   createOverlay: Create overlay div with size and position based on the
+*   boundingRect properties of its corresponding target element.
+*/
+function createOverlay (tgt, rect, cname) {
+  let scrollOffsets = getScrollOffsets();
+  const MINWIDTH  = 68;
+  const MINHEIGHT = 27;
+
+  let node = document.createElement("div");
+  node.setAttribute("class", [cname, 'oaa-element-overlay'].join(' '));
+  node.startLeft = (rect.left + scrollOffsets.x) + "px";
+  node.startTop  = (rect.top  + scrollOffsets.y) + "px";
+
+  node.style.left = node.startLeft;
+  node.style.top  = node.startTop;
+  node.style.width  = Math.max(rect.width, MINWIDTH) + "px";
+  node.style.height = Math.max(rect.height, MINHEIGHT) + "px";
+  node.style.borderColor = tgt.color;
+  node.style.zIndex = zIndex;
+
+  let label = document.createElement("div");
+  label.setAttribute("class", 'oaa-overlay-label');
+  label.style.backgroundColor = tgt.color;
+  label.innerHTML = tgt.label;
+
+  node.appendChild(label);
+  return node;
+}
+
+/*
+*   addDragAndDrop: Add drag-and-drop and reposition functionality to an
+*   overlay div element created by the createOverlay function.
+*/
+function addDragAndDrop (node) {
+
+  function hoistZIndex (el) {
+    let incr = 100;
+    el.style.zIndex = zIndex += incr;
+  }
+
+  function repositionOverlay (el) {
+    el.style.left = el.startLeft;
+    el.style.top  = el.startTop;
+  }
+
+  let labelDiv = node.firstChild;
+
+  labelDiv.onmousedown = function (event) {
+    drag(this.parentNode, hoistZIndex, event);
+  };
+
+  labelDiv.ondblclick = function (event) {
+    repositionOverlay(this.parentNode);
+  };
+}
+
+/*
+*   actions.js: functions adding and removing DOM overlay elements
+*/
+
+/*
+*   addNodes: Use targetList to generate nodeList of elements and to
+*   each of these, add an overlay with a unique CSS class name.
+*   Optionally, if getInfo is specified, add tooltip information;
+*   if dndFlag is set, add drag-and-drop functionality.
+*/
+function addNodes (params) {
+  let targetList = params.targetList,
+      cssClass = params.cssClass,
+      getInfo = params.getInfo,
+      evalInfo = params.evalInfo,
+      dndFlag = params.dndFlag;
+  let counter = 0;
+
+  targetList.forEach(function (target) {
+    // Collect elements based on selector defined for target
+    let elements = document.querySelectorAll(target.selector);
+
+    // Filter elements if target defines a filter function
+    if (typeof target.filter === 'function')
+      elements = Array.prototype.filter.call(elements, target.filter);
+
+    Array.prototype.forEach.call(elements, function (element) {
+      if (isVisible(element)) {
+        let info = getInfo(element, target);
+        if (evalInfo) evalInfo(info, target);
+        let boundingRect = element.getBoundingClientRect();
+        let overlayNode = createOverlay(target, boundingRect, cssClass);
+        if (dndFlag) addDragAndDrop(overlayNode);
+        let labelNode = overlayNode.firstChild;
+        labelNode.title = formatInfo(info);
+        document.body.appendChild(overlayNode);
+        counter += 1;
+      }
+    });
+  });
+
+  return counter;
+}
+
+/*
+*   removeNodes: Use the unique CSS class name supplied to addNodes
+*   to remove all instances of the overlay nodes.
+*/
+function removeNodes (cssClass) {
+  let selector = "div." + cssClass;
+  let elements = document.querySelectorAll(selector);
+  Array.prototype.forEach.call(elements, function (element) {
+    document.body.removeChild(element);
+  });
+}
+
+/*
+*   dialog.js: functions for creating, modifying and deleting message dialog
+*/
+
+/*
+*   setBoxGeometry: Set the width and position of message dialog based on
+*   the width of the browser window. Called by functions resizeMessage and
+*   createMsgOverlay.
+*/
+function setBoxGeometry (dialog) {
+  let width  = window.innerWidth / 3.2;
+  let left   = window.innerWidth / 2 - width / 2;
+  let scroll = getScrollOffsets();
+
+  dialog.style.width = width + "px";
+  dialog.style.left  = (scroll.x + left) + "px";
+  dialog.style.top   = (scroll.y + 30) + "px";
+}
+
+/*
+*   createMsgDialog: Construct and position the message dialog whose
+*   purpose is to alert the user when no target elements are found by
+*   a bookmarklet.
+*/
+function createMsgDialog (cssClass, handler) {
+  let dialog = document.createElement("div");
+  let button  = document.createElement("button");
+
+  dialog.className = cssClass;
+  setBoxGeometry(dialog);
+
+  button.onclick = handler;
+
+  dialog.appendChild(button);
+  document.body.appendChild(dialog);
+  return dialog;
+}
+
+/*
+*   deleteMsgDialog: Use reference to delete message dialog.
+*/
+function deleteMsgDialog (dialog) {
+  if (dialog) document.body.removeChild(dialog);
+}
+
+/*
+*   MessageDialog: Wrapper for show, hide and resize methods
+*/
+function MessageDialog () {
+  this.GLOBAL_NAME = 'a11yMessageDialog';
+  this.CSS_CLASS = 'oaa-message-dialog';
+}
+
+/*
+*   show: show message dialog
+*/
+MessageDialog.prototype.show = function (title, message) {
+  const MSG_DIALOG = this.GLOBAL_NAME;
+  let h2, div;
+
+  if (!window[MSG_DIALOG])
+    window[MSG_DIALOG] = createMsgDialog(this.CSS_CLASS, event => this.hide());
+
+  h2 = document.createElement("h2");
+  h2.innerHTML = title;
+  window[MSG_DIALOG].appendChild(h2);
+
+  div = document.createElement("div");
+  div.innerHTML = message;
+  window[MSG_DIALOG].appendChild(div);
+};
+
+/*
+*   hide: hide message dialog
+*/
+MessageDialog.prototype.hide = function () {
+  const MSG_DIALOG = this.GLOBAL_NAME;
+  if (window[MSG_DIALOG]) {
+    deleteMsgDialog(window[MSG_DIALOG]);
+    delete(window[MSG_DIALOG]);
+  }
+};
+
+/*
+*   resize: resize message dialog
+*/
+MessageDialog.prototype.resize = function () {
+  const MSG_DIALOG = this.GLOBAL_NAME;
+  if (window[MSG_DIALOG])
+    setBoxGeometry(window[MSG_DIALOG]);
+};
+
+/*
+*   Bookmarklet.js
+*/
+
+/* eslint no-console: 0 */
+function logVersionInfo (appName) {
+  console.log(getTitle() + ' : v' + getVersion() + ' : ' + appName);
+}
+
+function Bookmarklet (params) {
+  let globalName = getGlobalName(params.appName);
+
+  // use singleton pattern
+  if (typeof window[globalName] === 'object')
+    return window[globalName];
+
+  this.appName  = params.appName;
+  this.cssClass = params.cssClass;
+  this.msgText  = params.msgText;
+  this.params   = params;
+  this.show     = false;
+
+  let dialog = new MessageDialog();
+  window.addEventListener('resize', event => {
+    removeNodes(this.cssClass);
+    dialog.resize();
+    this.show = false;
+  });
+
+  window[globalName] = this;
+  logVersionInfo(this.appName);
+}
+
+Bookmarklet.prototype.run = function () {
+  let dialog = new MessageDialog();
+
+  dialog.hide();
+  this.show = !this.show;
+
+  if (this.show) {
+    if (addNodes(this.params) === 0) {
+      dialog.show(this.appName, this.msgText);
+      this.show = false;
+    }
+  }
+  else {
+    removeNodes(this.cssClass);
+  }
+};
+
+/*
+*   InfoObject.js
+*/
+
+/*
+*  nameIncludesDescription: Determine whether accName object's name
+*  property includes the accDesc object's name property content.
+*/
+function nameIncludesDescription (accName, accDesc) {
+  if (accName === null || accDesc === null) return false;
+
+  let name = accName.name, desc = accDesc.name;
+  if (typeof name === 'string' && typeof desc === 'string') {
+    return name.toLowerCase().includes(desc.toLowerCase());
+  }
+
+  return false;
+}
+
+function InfoObject (element, title) {
+  this.title     = title;
+  this.element   = getElementInfo(element);
+  this.grpLabels = getGroupingLabels(element);
+  this.accName   = getAccessibleName(element);
+  this.accDesc   = getAccessibleDesc(element);
+  this.role      = getAriaRole(element);
+
+  // Ensure that accessible description is not a duplication
+  // of accessible name content. If it is, nullify the desc.
+  if (nameIncludesDescription (this.accName, this.accDesc)) {
+    this.accDesc = null;
+  }
+}
+
+InfoObject.prototype.addProps = function (val) {
+  this.props = val;
+};
+
+/*
+*   init.js: init functions for bookmarklets
+*/
+
+/*
+*   initForms
+*/
+
+function initForms () {
+
+  addPolyfills();
+
+  let targetList = [
+    {selector: "button",   color: "purple", label: "button"},
+    {selector: "input",    color: "navy",   label: "input"},
+    {selector: "keygen",   color: "gray",   label: "keygen"},
+    {selector: "meter",    color: "maroon", label: "meter"},
+    {selector: "output",   color: "teal",   label: "output"},
+    {selector: "progress", color: "olive",  label: "progress"},
+    {selector: "select",   color: "green",  label: "select"},
+    {selector: "textarea", color: "brown",  label: "textarea"}
+  ];
+
+  let selectors = targetList.map(function (tgt) {return '<li>' + tgt.selector + '</li>';}).join('');
+
+  function getInfo (element, target) {
+    return new InfoObject(element, 'FORM INFO');
+  }
+
+  let params = {
+    appName:    "Forms",
+    cssClass:   getCssClass("Forms"),
+    msgText:    "No form-related elements found: <ul>" + selectors + "</ul>",
+    targetList: targetList,
+    getInfo:    getInfo,
+    dndFlag:    true
+  };
+
+  return new Bookmarklet(params);
+}
+
+/*
+*   headings.js: highlight heading elements
+*/
+
+function initHeadings () {
+
+  addPolyfills();
+
+  let targetList = [
+    {selector: "h1", color: "navy",   label: "h1"},
+    {selector: "h2", color: "olive",  label: "h2"},
+    {selector: "h3", color: "purple", label: "h3"},
+    {selector: "h4", color: "green",  label: "h4"},
+    {selector: "h5", color: "gray",   label: "h5"},
+    {selector: "h6", color: "brown",  label: "h6"}
+  ];
+
+  let selectors = targetList.map(function (tgt) {return tgt.selector;}).join(', ');
+
+  function getInfo (element, target) {
+    let info = new InfoObject(element, 'HEADING INFO');
+    info.addProps('level ' + target.label.substring(1));
+    return info;
+  }
+
+  let params = {
+    appName:    "Headings",
+    cssClass:   getCssClass("Headings"),
+    msgText:    "No heading elements (" + selectors + ") found.",
+    targetList: targetList,
+    getInfo:    getInfo,
+    dndFlag:    true
+  };
+
+  return new Bookmarklet(params);
+}
+
+/*
+*   initImages
+*/
+
+function initImages () {
+
+  addPolyfills();
+
+  let targetList = [
+    {selector: "area", color: "teal",   label: "area"},
+    {selector: "img",  color: "olive",  label: "img"},
+    {selector: "svg",  color: "purple", label: "svg"}
+  ];
+
+  let selectors = targetList.map(function (tgt) {return tgt.selector;}).join(', ');
+
+  function getInfo (element, target) {
+    return new InfoObject(element, 'IMAGE INFO');
+  }
+
+  let params = {
+    appName:    "Images",
+    cssClass:   getCssClass("Images"),
+    msgText:    "No image elements (" + selectors + ") found.",
+    targetList: targetList,
+    getInfo:    getInfo,
+    dndFlag:    true
+  };
+
+  return new Bookmarklet(params);
+}
+
+/*
+*   initInteractive
+*/
+
+/*
+*   Interactive elements as defined by HTML5:
+*   From 'HTML5 3. Semantics, structure, and APIs of HTML documents'
+*   http://www.w3.org/TR/html5/dom.html#interactive-content
+*
+*   a, audio[controls], button, embed, iframe, img[usemap],
+*   input (type not in hidden state), keygen, label,
+*   object[usemap], select, textarea, video[controls]
+*/
+
+function initInteractive () {
+
+  addPolyfills();
+
+  let targetList = [
+    // interactive elements defined in HTML5 spec
+    {selector: "a",                    color: "olive",  label: "a"},
+    {selector: "audio[controls]",      color: "olive",  label: "audio"},
+    {selector: "button",               color: "olive",  label: "button"},
+    {selector: "embed",                color: "purple", label: "embed"},
+    {selector: "iframe",               color: "teal",   label: "iframe"},
+    {selector: "img[usemap]",          color: "maroon", label: "img"},
+    {selector: "input",                color: "navy",   label: "input"},
+    {selector: "keygen",               color: "teal",   label: "keygen"},
+    {selector: "label",                color: "purple", label: "label"},
+    {selector: "object[usemap]",       color: "gray",   label: "object"},
+    {selector: "select",               color: "green",  label: "select"},
+    {selector: "textarea",             color: "navy",   label: "textarea"},
+    {selector: "video[controls]",      color: "navy",   label: "video"},
+
+    // other form elements
+    {selector: "meter",                color: "maroon", label: "meter"},
+    {selector: "output",               color: "brown",  label: "output"},
+    {selector: "progress",             color: "gray",   label: "progress"},
+
+    // other elements potentially interactive
+    {selector: "area",                 color: "brown",  label: "area"},
+    {selector: "details",              color: "purple", label: "details"},
+    {selector: "svg",                  color: "green",  label: "svg"},
+    {selector: "[tabindex]",           color: "teal",   label: "tabindex"}
+  ];
+
+  let selectors = targetList.map(function (tgt) {return tgt.selector;}).join(', ');
+
+  function getInfo (element, target) {
+    return new InfoObject(element, 'INTERACTIVE INFO');
+  }
+
+  function evalInfo (info, target) {
+    target.color = (info.accName === null) ? 'maroon' : '#008080';
+  }
+
+  let params = {
+    appName:    "Interactive",
+    cssClass:   getCssClass("Interactive"),
+    msgText:    "No interactive elements (" + selectors + ") found.",
+    targetList: targetList,
+    getInfo:    getInfo,
+    evalInfo:   evalInfo,
+    dndFlag:    true
+  };
+
+  return new Bookmarklet(params);
+}
+
+/*
+*   initLandmarks
+*/
+
+function initLandmarks () {
+
+  addPolyfills();
+
+  // Filter function called on a list of elements returned by selector
+  // 'footer, [role="contentinfo"]'. It returns true for the following
+  // conditions: (1) element IS NOT a footer element; (2) element IS a
+  // footer element AND IS NOT a descendant of article or section.
+  function isContentinfo (element) {
+    if (element.tagName.toLowerCase() !== 'footer') return true;
+    if (!isDescendantOf(element, ['article', 'section'])) return true;
+    return false;
+  }
+
+  // Filter function called on a list of elements returned by selector
+  // 'header, [role="banner"]'. It returns true for the following
+  // conditions: (1) element IS NOT a header element; (2) element IS a
+  // header element AND IS NOT a descendant of article or section.
+  function isBanner (element) {
+    if (element.tagName.toLowerCase() !== 'header') return true;
+    if (!isDescendantOf(element, ['article', 'section'])) return true;
+    return false;
+  }
+
+  let targetList = [
+    {selector: 'aside:not([role]), [role~="complementary"], [role~="COMPLEMENTARY"]',         color: "maroon", label: "complementary"},
+    {selector: 'footer, [role~="contentinfo"], [role~="CONTENTINFO"]', filter: isContentinfo, color: "olive",  label: "contentinfo"},
+    {selector: '[role~="application"], [role~="APPLICATION"]',                                color: "black",  label: "application"},
+    {selector: 'nav, [role~="navigation"], [role~="NAVIGATION"]',                             color: "green",  label: "navigation"},
+    {selector: '[role~="region"][aria-labelledby], [role~="REGION"][aria-labelledby]',        color: "teal",   label: "region"},
+    {selector: '[role~="region"][aria-label], [role~="REGION"][aria-label]',                  color: "teal",   label: "region"},
+    {selector: 'section[aria-labelledby], section[aria-label]',                               color: "teal",   label: "region"},
+    {selector: 'header, [role~="banner"], [role~="BANNER"]', filter: isBanner,                color: "gray",   label: "banner"},
+    {selector: '[role~="search"], [role~="SEARCH"]',                                          color: "purple", label: "search"},
+    {selector: 'main, [role~="main"], [role~="MAIN"]',                                        color: "navy",   label: "main"}
+  ];
+
+  let selectors = targetList.map(function (tgt) {return '<li>' + tgt.selector + '</li>';}).join('');
+
+  function getInfo (element, target) {
+    return new InfoObject(element, 'LANDMARK INFO');
+  }
+
+  let params = {
+    appName:    "Landmarks",
+    cssClass:   getCssClass("Landmarks"),
+    msgText:    "No elements with ARIA Landmark roles found: <ul>" + selectors + "</ul>",
+    targetList: targetList,
+    getInfo:    getInfo,
+    dndFlag:    true
+  };
+
+  return new Bookmarklet(params);
+}
+
+/*
+*   initLists
+*/
+
+function initLists () {
+
+  addPolyfills();
+
+  let targetList = [
+    {selector: "dl", color: "olive",  label: "dl"},
+    {selector: "ol", color: "purple", label: "ol"},
+    {selector: "ul", color: "navy",   label: "ul"}
+  ];
+
+  let selectors = targetList.map(function (tgt) {return tgt.selector;}).join(', ');
+
+  function getInfo (element, target) {
+    let listCount;
+
+    switch (target.label) {
+      case 'dl':
+        listCount = countChildrenWithTagNames(element, ['DT', 'DD']);
+        break;
+      case 'ol':
+      case 'ul':
+        listCount = countChildrenWithTagNames(element, ['LI']);
+        break;
+    }
+
+    let info = new InfoObject(element, 'LIST INFO');
+    info.addProps(listCount + ' items');
+    return info;
+  }
+
+  let params = {
+    appName:    "Lists",
+    cssClass:   getCssClass("Lists"),
+    msgText:    "No list elements (" + selectors + ") found.",
+    targetList: targetList,
+    getInfo:    getInfo,
+    dndFlag:    true
+  };
+
+  return new Bookmarklet(params);
 }
