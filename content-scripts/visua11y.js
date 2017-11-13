@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 function visua11y (request, sender, sendResponse) {
   runSelectedApp(request.selection);
